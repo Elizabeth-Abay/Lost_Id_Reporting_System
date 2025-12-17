@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>React CDN</title>
+
+  <!-- React core -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+
+  <!-- React DOM -->
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      return (
+        <div>
+          <h1>Hello React 👋</h1>
+          <ul>
+            <li>Abebe</li>
+            <li>Kebede</li>
+            <li>Almaz</li>
+          </ul>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+
+</body>
+</html>
+

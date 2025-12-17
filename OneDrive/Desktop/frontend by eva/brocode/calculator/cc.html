@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="calculater.css">
+    <style>
+        
+/* Variables for colors and shadows */
+:root {
+    --light-bg: #f5f6fa;
+    --main-bg: #e0e0e0;
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --pink: #ed87a5;
+    --text-color: #333;
+}
+
+/* Base Styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #f0e6ff, #ffe6f5);
+    font-family: Arial, sans-serif;
+}
+
+/* Calculator Container (The main white card) */
+.calculator {
+    width: 400px;
+    padding: 20px;
+    border-radius: 30px;
+    background: var(--light-bg);
+    box-shadow: 10px 10px 20px var(--shadow-dark), 
+                -10px -10px 20px var(--shadow-light);
+}
+
+/* Display Text Field (The single pill-shaped input area) */
+.display-text {
+    height: 90px; /* Increased height to fit two lines */
+    background: var(--light-bg);
+    border-radius: 40px;
+    padding: 5px 30px;
+    
+    /* Use Flexbox to stack the lines */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    align-items: flex-end; /* Align all content to the right */
+    
+    overflow: hidden;
+    
+    /* Inner Neumorphic shadow for a 'pressed in' look */
+    box-shadow: inset 5px 5px 10px var(--shadow-dark), 
+                inset -5px -5px 10px var(--shadow-light);
+    margin-bottom: 25px;
+}
+
+/* Style for the smaller expression line (Top line) */
+.expression-line {
+    font-size: 1.2em;
+    color: #888; /* Lighter color for secondary text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 30px;
+}
+
+/* Style for the main result/input line (Bottom line) */
+.result-line {
+    font-size: 3em;
+    font-weight: 300;
+    color: var(--text-color);
+    line-height: 1; /* Ensure close spacing */
+    height: 45px;
+}
+
+/* --- BUTTON STYLES (Remain the same as before) --- */
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.btn {
+    height: 60px;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    font-size: 1.2em;
+    font-weight: 400;
+    cursor: pointer;
+    background: var(--light-bg);
+    color: var(--text-color);
+    box-shadow: 5px 5px 10px var(--shadow-dark), 
+                -5px -5px 10px var(--shadow-light);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:active {
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), 
+                inset -3px -3px 6px var(--shadow-light);
+}
+
+.equals {
+    grid-column: span 2;
+    border-radius: 30px;
+    background: var(--pink);
+    color: var(--light-bg);
+    font-size: 1.5em;
+    font-weight: 500;
+    box-shadow: 5px 5px 10px rgba(237, 135, 165, 0.5), 
+                -5px -5px 10px var(--shadow-light);
+}
+
+.equals:active {
+    box-shadow: inset 3px 3px 6px rgba(237, 135, 165, 0.7), 
+                inset -3px -3px 6px var(--shadow-light);
+}
+
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display-text">
+            <div class="expression-line" id="expression"></div>
+            <div class="result-line" id="display">0</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn function" data-value="clear">clr</button>
+            <button class="btn function" data-value="delete">DEL</button>
+            <button class="btn function" data-value="percent">%</button>
+            <button class="btn operator" data-value="/">/</button>
+
+            <button class="btn number" data-value="7">7</button>
+            <button class="btn number" data-value="8">8</button>
+            <button class="btn number" data-value="9">9</button>
+            <button class="btn operator" data-value="*">*</button>
+
+            <button class="btn number" data-value="4">4</button>
+            <button class="btn number" data-value="5">5</button>
+            <button class="btn number" data-value="6">6</button>
+            <button class="btn operator" data-value="-">-</button>
+
+            <button class="btn number" data-value="1">1</button>
+            <button class="btn number" data-value="2">2</button>
+            <button class="btn number" data-value="3">3</button>
+            <button class="btn operator" data-value="+">+</button>
+
+            <button class="btn number" data-value=".">.</button>
+            <button class="btn number" data-value="0">0</button>
+            <button class="btn equals" data-value="equals">=</button>
+        </div>
+    </div>
+
+    <script src="calculater.js"></script>
+    <script>
+        Document.addEventListener('DOMContentLoaded', () => {
+    const display = document.getElementById('display');
+    const expressionDisplay = document.getElementById('expression'); // New element
+    const buttons = document.querySelectorAll('.btn');
+
+    let currentInput = '0';
+    let fullExpression = ''; // New variable to track the full string
+    let waitForNewInput = true; // Start ready for a new number
+
+    // Function to update the main display
+    const updateDisplay = (value) => {
+        // Limit display length to avoid overflow
+        display.textContent = String(value).slice(0, 10);
+    };
+
+    // Function to update the expression display
+    const updateExpression = (value) => {
+        expressionDisplay.textContent = value;
+    };
+
+    // Main function to handle button clicks
+    const handleButtonClick = (value) => {
+        // Handle Number and Decimal Point Input
+        if (!isNaN(parseFloat(value))  value === '.') {
+            if (waitForNewInput  currentInput === '0') {
+                // If starting a new number or display is '0'
+                currentInput = (value === '.') ? '0.' : value;
+                waitForNewInput = false;
+            } else if (value === '.' && currentInput.includes('.')) {
+                return; // Ignore multiple decimals
+            } else {
+                currentInput += value;
+            }
+            updateDisplay(currentInput);
+            return;
+        }
+
+        // Handle Operator Input (+, -, *, /)
+        if (['+', '-', '*', '/'].includes(value)) {
+            // Append the number and the operator to the full expression
+            if (!waitForNewInput) {
+                fullExpression += currentInput + ' ' + value + ' ';
+            } else {
+                // If operator is pressed right after another operator or equals, replace the last operator
+                fullExpression = fullExpression.trim().slice(0, -1) + ' ' + value + ' ';
+            }
+            
+            updateExpression(fullExpression);
+            currentInput = '0';
+            waitForNewInput = true;
+            return;
+        }
+
+        // Handle Function Buttons (Clear, Delete, Percent, Equals)
+        switch (value) {
+            case 'clear':
+                currentInput = '0';
+                fullExpression = '';
+                waitForNewInput = true;
+                updateDisplay(currentInput);
+                updateExpression(fullExpression);
+                break;
+
+            case 'delete':
+                if (!waitForNewInput) {
+                    if (currentInput.length > 1 && currentInput !== 'Error') {
+                        currentInput = currentInput.slice(0, -1);
+                    } else {
+                        currentInput = '0';
+                        waitForNewInput = true;
+                    }
+                    updateDisplay(currentInput);
+                }
+                break;
+
+            case 'percent':
+                if (currentInput !== '0' && currentInput !== 'Error') {
+                    // Calculate percentage of the current number
+                    currentInput = String(parseFloat(currentInput) / 100);
+                    updateDisplay(currentInput);
+                }
+                break;
+
+
+case 'equals':
+                if (!waitForNewInput && fullExpression.length > 0) {
+                    // 1. Add the final number to the expression
+                    fullExpression += currentInput;
+                    updateExpression(fullExpression + ' =');
+                    
+                    // 2. Safely evaluate the full expression
+                    try {
+                        // Use eval() to calculate the full mathematical string.
+                        // NOTE: Using eval() can be a security risk in complex apps, 
+                        // but is common for simple calculator demos.
+                        // For safer, complex parsing, a math expression parser is needed.
+                        let result = eval(fullExpression.replace(/%/g, '/100')); 
+                        
+                        // Fix for floating point precision issues
+                        result = parseFloat(result.toFixed(8)); 
+
+                        updateDisplay(result);
+                        currentInput = String(result);
+                    } catch (e) {
+                        updateDisplay('Error');
+                        currentInput = 'Error';
+                    }
+                    
+                    // 3. Reset state for new calculations
+                    fullExpression = '';
+                    waitForNewInput = true; 
+                }
+                break;
+        }
+    };
+
+    // Attach click listeners to all buttons
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const value = button.getAttribute('data-value');
+            handleButtonClick(value);
+        });
+    });
+
+    // Initial display update
+    updateDisplay(currentInput);
+});
+    </script>
+</body>
+</html>
+
+
+
+

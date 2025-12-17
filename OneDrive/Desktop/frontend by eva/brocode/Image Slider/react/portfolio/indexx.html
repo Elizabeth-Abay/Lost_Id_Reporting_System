@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .todo-container {
+      background: #ffffff;
+      width: 350px;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0f172a;
+    }
+
+    .input-group {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px 0 0 8px;
+      border: 1px solid #cbd5e1;
+      outline: none;
+    }
+
+    .input-group button {
+      padding: 10px 15px;
+      border: none;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+    }
+
+    .input-group button:hover {
+      background: #1d4ed8;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f8fafc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    li.completed span {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .actions button {
+      margin-left: 5px;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .complete-btn {
+      background: #22c55e;
+      color: white;
+    }
+
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="todo-container">
+    <h2>Todo List</h2>
+
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Enter a task" />
+      <button onclick="addTask()">Add</button>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+
+    function addTask() {
+      const taskText = taskInput.value.trim();
+      if (taskText === '') return;
+
+      const li = document.createElement('li');
+
+      const span = document.createElement('span');
+      span.textContent = taskText;
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const completeBtn = document.createElement('button');
+      completeBtn.textContent = '✓';
+      completeBtn.className = 'complete-btn';
+      completeBtn.onclick = () => li.classList.toggle('completed');
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '✕';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.onclick = () => li.remove();
+
+      actions.appendChild(completeBtn);
+      actions.appendChild(deleteBtn);
+
+      li.appendChild(span);
+      li.appendChild(actions);
+
+      taskList.appendChild(li);
+      taskInput.value = '';
+    }
+
+    taskInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addTask();
+    });
+  </script>
+
+</body>
+</html>

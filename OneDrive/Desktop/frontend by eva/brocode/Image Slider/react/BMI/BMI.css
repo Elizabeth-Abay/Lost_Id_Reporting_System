@@ -1,0 +1,132 @@
+
+
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 28px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #4a90e2;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 14px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4a90e2;
+    }
+
+    .gender {
+      display: flex;
+      gap: 15px;
+      margin: 25px 0;
+      justify-content: center;
+    }
+
+    .gender label {
+      flex: 1;
+      padding: 16px;
+      background: #e8f0fe;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #4a90e2;
+      transition: all 0.3s;
+    }
+
+    .gender input[type="radio"] {
+      display: none;
+    }
+
+    .gender input[type="radio"]:checked + label {
+      background: #4a90e2;
+      color: white;
+    }
+
+    .calculate-btn {
+      background: #4a90e2;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px;
+      border: none;
+      border-radius: 16px;
+      width: 100%;
+      cursor: pointer;
+      margin: 20px 0;
+      box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+      transition: all 0.3s;
+    }
+
+    .calculate-btn:hover {
+      background: #357abd;
+      transform: translateY(-3px);
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8fbff;
+      border-radius: 16px;
+      display: none;
+    }
+
+    .bmi-value {
+      font-size: 42px;
+      font-weight: 700;
+      color: #4a90e2;
+      margin: 10px 0;
+    }
+
+    .bmi-status {
+      font-size: 20px;
+      font-weight: 600;
+      color: #e74c3c;
+    }
+
+    /* Status colors */
+    .underweight { color: #3498db; }
+    .normal { color: #2ecc71; }
+    .overweight { color: #f39c12; }
+    .obese { color: #e67e22; }
+    .extremely-obese { color: #e74c3c; }
