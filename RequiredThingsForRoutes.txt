@@ -1,0 +1,14 @@
+To generate access token - sentInfo = {userId , userRole}
+To generate refresh token - u need to send  the randomstring = sentInfo = {randomString : randomString , userId : userId}
+refreshToken contains the following info - {expiresAt  ,randomString , role}
+accessToken contains the following - { expiresAt , userId , role}
+
+To generate the access token then u have to have the refresh token in the post request
+{ refreshToken }
+
+
+When generating an accessToken if the refreshToken is invalid reason : "Invalid Ref Token"
+Then just display the login page from the front end side
+
+When users signOut then the front end will delete the access and refresh token from the local storage upon successful invalidation message from the backend
+Sign out is a post request

@@ -1,0 +1,298 @@
+// So here the plan is to use the OOP principles to build 2 classes
+// One for sign up 
+// One for log in and sign Out
+// and instantiate and export objects from the two classes
+
+const { jwtDecode } = require('jwt-decode');
+
+const { givenEmailSelectPassword } = require('../model/userLogInModel.js');
+const { createAccessToken, createRefreshToken } = require('./AccessAndRefreshTokenGen.js');
+
+const { InvalidateRefreshToken } = require('../model/userSignOutModel.js');
+
+
+
+const bcrypt = require('bcrypt'); // to hash the password for sign up and log in
+
+const otpGenerator = require('otp-generator'); // generate otp for sign up
+
+const crypto = require('crypto'); // quick hashing for the otp and useful for generating a string for the refresh token
+// const { v4: uuidv4 } = require('uuid'); // generate random strings for refresh tokens
+
+const EventEmitter = require('events'); // emit and listen for events for when user sign up to send emails
+
+
+
+
+
+
+// to talk with the database u need a function defined from the model
+const { checkEmailIsVerifiedBefore, createPendingUser, checkTheOTPmatches, deleteUserFromPendingState } = require('../model/userSignUpModel.js')
+const { signUpEventListener } = require('../events/userSignUpListener.js');
+
+
+
+
+
+class SignUpHandler extends EventEmitter {
+
+    constructor() {
+        super();
+        this.on('user_created', signUpEventListener);
+        // setting up thie listener
+        // console.log(signUpEventListener);
+    };
+
+    async userSignUp(sentInfo) {
+        try {
+
+            // sentInfo = { username , email , password }
+            // this is the function that will put the user inside the database
+
+            // hash the password 
+            let saltgen = await bcrypt.genSalt();
+            let hashedPw = await bcrypt.hash(sentInfo.password, saltgen);
+            // when u hash a password bcrypt generates a random salt and gives u the slowly hashed pw + salt
+
+
+            // create otp 
+            let OTP = otpGenerator.generate(
+                8, {
+                digits: true,
+                upperCaseAlphabets: true,
+                lowerCaseAlphabets: true
+            }
+            ); // the otp has 8 digits and has got all the object's types
+
+
+
+
+            // hash the otp
+            // while hashing the otp u dont need slow hashing algorithms bc it is short-lived
+            // so use crypto with faster hashing algo
+            let hashedOTP = crypto.createHash('sha1').update(OTP).digest('hex');
+            // hash the otp with sha1 algo and create the hash with hexadecimal representation
+
+
+            // request the model to insert the user into pending
+            let userPending = await createPendingUser({
+                username: sentInfo.username,
+                email: sentInfo.email,
+                password_hashed: hashedPw,
+                otp_hashed: hashedOTP
+            });
+
+            // console.log(OTP);
+            // console.log("Hello")
+
+            // console.log(userPending)
+            if (userPending.success) {
+                console.log("event is emitted")
+
+                // and then once the user has entered into the 
+                // database then emit an event to notify listeners to send the email
+
+
+                this.emit('user_created', {
+                    username: sentInfo.username,
+                    email: sentInfo.email,
+                    OTP
+                })
+
+
+                return {
+                    success: true
+                }
+            }
+
+            return userPending;
+
+        } catch (err) {
+            console.log("signUpService.userSignUp error : ", err.message)
+            return {
+                success: false,
+                reason: "error while signUpService.userSignUp"
+            }
+        }
+
+        // console.log("Is it correct ie is user inserted properly userSignUpService line 66 " , isItCorrect)
+
+    }
+
+    async ValidateOTPandGenerateTokens(sentInfo) {
+        try {
+            // sentInfo = { email , OTP }  ** the otp is sent unhashed
+
+            let { email, OTP } = sentInfo;
+
+            // hash the otp
+            let OTP_hashed = crypto.createHash('sha1').update(OTP).digest('hex');
+
+
+            let doesOTPMatch = await checkTheOTPmatches({ email, OTP_hashed });
+            console.log("doesOTPMatch result ", doesOTPMatch);
+
+            if (doesOTPMatch.success) {
+                let dataReceived = doesOTPMatch.data;
+                // first delete OTP info from pending user
+                let verified = await deleteUserFromPendingState( dataReceived.id );
+                // then go on and generate access and refresh tokens
+
+                if (verified.success) {
+                    // Default role to "user" - you may want to retrieve this from database in the future
+                    let role = dataReceived.role; // needs to come from the user now
+                    let randomString = crypto.randomBytes(64).toString("hex"); // Generate random string for refresh token
+                    
+                    let accessToken = createAccessToken({ userId: dataReceived.id , role });
+
+                    let refreshToken = await createRefreshToken({ userId: dataReceived.id , randomString , role });
+
+                    return {
+                        success: true,
+                        data: {
+                            accessToken: accessToken.data,
+                            refreshToken: refreshToken.data
+                        }
+                    }
+
+                }
+
+                else {
+                    return {
+                        success: false,
+                        reason: "Couldn't delete the user from pending state"
+                    }
+                }
+            }
+
+            else {
+                // ie the otp dont match or internal server error response 
+                // determined after uk the reason in the controller
+                return doesOTPMatch;
+            }
+        } catch (err) {
+            console.log("ValidateOTPandGenerateTokens error", err.message);
+            return {
+                success: false,
+                reason: "error while ValidateOTPandGenerateTokens"
+            }
+        }
+
+    }
+}
+
+
+
+class UserLogInSignOut {
+    constructor() { }
+
+
+    async SignOut(sentInfo) {
+        try {
+            // sentInfo = {refreshToken}
+            // when user signs out we just invalidate the refresh token from the backend
+            let { refreshToken } = sentInfo;
+            // first decode the refresh token to get the randomString, then hash it to get token_hash
+            let decoded = jwtDecode(refreshToken);
+            let randomString = decoded.randomString;
+            let tokenHash = crypto.createHash("sha256").update(randomString).digest("hex");
+
+            let result = await InvalidateRefreshToken(tokenHash);
+
+            if (result.success) {
+                return {
+                    success: true,
+                }
+            } else {
+                return {
+                    success: false,
+                    reason: "Error from InvalidateRefreshToken in the model"
+                }
+            }
+
+        } catch (err) {
+            console.log("Error from UserLogInLogOutSignOut.SignOut ", err.message);
+            return {
+                success: false,
+                reason: "Error while UserLogInLogOutSignOut.SignOut"
+            }
+        }
+    }
+
+    async LogIn(sentInfo) {
+        try {
+            // sentInfo = {email , password} ** password is unhashed
+            let { email, password } = sentInfo;
+
+
+
+            // then receive the password from the model
+            let passwordHased = await givenEmailSelectPassword({ email });
+
+            if (passwordHased.success) {
+                // ie the request was successful
+                // compare the password given with the hashed version
+                let passwordsMatch = await bcrypt.compare(password, passwordHased.data.password);
+
+                if (passwordsMatch) {
+                    // generate and send the access and refresh token
+                    let userId = passwordHased.data.id;
+                    let role = passwordHased.data.role; // role comes from the database not from the user 
+                    // Default role to "user" - you may want to retrieve this from database in the future
+                    let randomString = crypto.randomBytes(64).toString("hex"); // Generate random string for refresh token
+
+                    let accessToken = createAccessToken({ userId, role });
+                    let refreshToken = await createRefreshToken({ userId, randomString, role});
+
+                    return {
+                        success: true,
+                        data: {
+                            accessToken: accessToken.data,
+                            refreshToken: refreshToken.data
+                        }
+                    }
+
+                } else {
+                    // passwords dont match
+                    return {
+                        success: false,
+                        reason: "password or email mismatch"
+                    }
+                }
+
+
+            } else {
+                // the request failed during database retrieval
+                return passwordHased;
+            }
+        } catch (err) {
+            console.log("UserLogInLogOutSignOut.LogIn Error :  ", err.message);
+            return {
+                success: false,
+                reason: "Error while UserLogInLogOutSignOut.LogIn "
+            }
+        }
+
+
+    }
+}
+
+
+
+let LogInLogOutSignOutHandler = new UserLogInSignOut();
+
+
+let signUpService = new SignUpHandler();
+
+module.exports = { LogInLogOutSignOutHandler, signUpService }
+
+
+// async function hello() {
+//     console.log(await LogInLogOutSignOutHandler.LogIn({
+//         email: 'elizabethabay1@gmail.com',
+//         password: "OllaOlla"
+//     }))
+// }
+
+
+// hello()
