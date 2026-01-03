@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAU Lost ID Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-blue: #1e3a8a;
+            --dark-blue: #0f1a3f;
+            --light-blue: #3b82f6;
+            --accent-blue: #60a5fa;
+            --white: #ffffff;
+            --off-white: #f8fafc;
+            --gray: #94a3b8;
+            --black: #0f172a;
+        }
+        
+        body {
+            background-color: var(--off-white);
+            color: var(--black);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 3D Background elements */
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .bg-element-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--light-blue), transparent);
+            top: 10%;
+            right: -100px;
+            transform: rotate(25deg);
+        }
+        
+        .bg-element-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--primary-blue), transparent);
+            bottom: -200px;
+            left: -100px;
+            transform: rotate(-15deg);
+        }
+        
+        .bg-element-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--accent-blue), transparent);
+            top: 50%;
+            left: 70%;
+            transform: rotate(45deg);
+        }
+        
+        .all-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+            position: relative;
+        }
+        
+        .navbar h1 {
+            color: var(--primary-blue);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .navbar h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 2px;
+        }
+        
+        .log-sign {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .sign-in, .sign-up {
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sign-in {
+            background-color: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .sign-up {
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            color: var(--white);
+            border: none;
+        }
+        
+        .sign-in:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(30, 58, 138, 0.2);
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .sign-up:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(30, 58, 138, 0.3);
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+        }
+        
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 60px 0 80px;
+            position: relative;
+        }
+        
+        .icon-circle {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.3);
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            top: -10px;
+            left: -10px;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .icon-circle svg {
+            width: 50px;
+            height: 50px;
+            stroke-width: 1.5;
+        }
+        
+        .hero h2 {
+            font-size: 3rem;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            min-width: 160px;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(30, 58, 138, 0.15);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        /* Features section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 60px 0 100px;
+            position: relative;
+        }
+        
+        .feature-box {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            transform-style: preserve-3d;
+        }
+        
+        .feature-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-blue));
+        }
+        
+        .feature-box:hover {
+            transform: translateY(-15px) rotateY(5deg);
+            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+        }
+        
+        .feature-text {
+            color: var(--gray);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+        
+        /* Call to action */
+        .cta-container {
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 80px 0;
+            box-shadow: 0 15px 35px rgba(15, 26, 63, 0.2);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        .cta-container::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+        }
+        
+        .cta-title {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-text {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: var(--primary-blue);
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(59, 130, 246, 0.1);
+            margin-top: 60px;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.3; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .stat-box {
+                width: 80%;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .log-sign {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero {
+                padding: 40px 0 60px;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+            
+            .sign-in, .sign-up {
+                padding: 10px 20px;
+            }
+            
+            .cta-container {
+                padding: 40px 20px;
+            }
+            
+            .cta-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Background elements -->
+    <div class="bg-element bg-element-1"></div>
+    <div class="bg-element bg-element-2"></div>
+    <div class="bg-element bg-element-3"></div>
+    
+    <div class="all-container">
+        <div class="container">
+            <!-- Navbar -->
+            <div class="navbar">
+                <h1>AAU Tracker</h1>
+                <div class="log-sign">
+                    <a href="login.html" class="sign-in">Login</a>
+                    <a href="sign-up.html" class="sign-up">Sign Up</a>
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="icon-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"
+                    viewBox="0 0 24 24" fill="none" stroke="white"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21 21-4.34-4.34"></path>
+                    <circle cx="11" cy="11" r="8"></circle>
+                    </svg>
+                </div>
+                <h2>Addis Ababa University<br>Lost ID Tracker</h2>
+                <p>The official automated system for reporting, tracking, and recovering lost student and staff IDs. Fast, secure, and efficient recovery powered by AI technology.</p>
+                
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Recovery Rate</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">24h</div>
+                        <div class="stat-label">Average Recovery Time</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">2.5K+</div>
+                        <div class="stat-label">IDs Recovered</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="feature-title">Report Lost IDs</div>
+                    <div class="feature-text">Quickly report your lost ID with details to help us find it faster. Our system immediately notifies campus security and other departments.</div>
+                </div>
+        
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title">Secure Recovery</div>
+                    <div class="feature-text">Verify your identity with multiple authentication steps and safely recover your found ID card. All transactions are encrypted and secure.</div>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="feature-title">AI-Powered Matching</div>
+                    <div class="feature-text">Advanced AI algorithms instantly match lost and found IDs across campus, significantly reducing recovery time and manual effort.</div>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="cta-container">
+                <h3 class="cta-title">Found  Some one ID?</h3>
+                <p class="cta-text">Don’t worry! Our system helps students quickly recover their lost IDs. Join thousands of AAU students who have successfully retrieved their IDs through our platform.</p>
+                <a href="sign-up.html" class="cta-button">Report  Here</a>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2026 Addis Ababa University Lost ID Tracker System. All rights reserved.</p>
+                <p>Contact: support@aau-idtracker.edu.et | Phone: +251 11 123 4567</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add interactive 3D effect to feature boxes
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureBoxes = document.querySelectorAll('.feature-box');
+            
+            featureBoxes.forEach(box => {
+                box.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-15px) rotateY(10deg) rotateX(5deg)';
+                });
+                
+                box.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) rotateY(0) rotateX(0)';
+                });
+            });
+            
+            // Add parallax effect to background elements
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const bg1 = document.querySelector('.bg-element-1');
+                const bg2 = document.querySelector('.bg-element-2');
+                const bg3 = document.querySelector('.bg-element-3');
+                
+                if (bg1 && bg2 && bg3) {
+                    bg1.style.transform = `rotate(${25 + scrolled * 0.05}deg) translateY(${scrolled * 0.05}px)`;
+                    bg2.style.transform = `rotate(${-15 - scrolled * 0.03}deg) translateY(${scrolled * 0.03}px)`;
+                    bg3.style.transform = `rotate(${45 + scrolled * 0.07}deg) translateY(${-scrolled * 0.02}px)`;
+                }
+            });
+            
+            // Add counter animation to stats
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const target = parseInt(stat.textContent);
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        stat.textContent = target + (stat.textContent.includes('%') ? '%' : '+');
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(current) + (stat.textContent.includes('%') ? '%' : '+');
+                    }
+                }, 40);
+            });
+        });
+    </script>
+</body>
+</html>
