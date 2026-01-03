@@ -1,229 +1,185 @@
-const express = require('express');
-const cors = require('cors');
-const pool = require('./config/database');
+const express = require("express");
+const cors = require("cors");
+const pool = require("./config/database");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+/* ================= MIDDLEWARE ================= */
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Increased limit for base64 files
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
-});
-
-// ==================== FOUND IDs ENDPOINTS ====================
-
-// GET all found IDs
-app.get('/foundIDs', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, name, found_id as "foundID", phone, email, created_at FROM found_ids ORDER BY created_at DESC'
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching found IDs:', error);
-    res.status(500).json({ error: 'Internal server error' });
+/* ================= EMAIL CONFIG ================= */
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
-// POST new found ID
-app.post('/foundIDs', async (req, res) => {
+/* ================= HEALTH ================= */
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", message: "Server running" });
+});
+
+/* ================= OTP ENDPOINTS ================= */
+
+/* SEND OTP */
+app.post("/send-otp", async (req, res) => {
   try {
-    const { name, foundID, phone, email } = req.body;
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email required" });
 
-    if (!name || !foundID || !phone || !email) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    const result = await pool.query(
-      'INSERT INTO found_ids (name, found_id, phone, email) VALUES ($1, $2, $3, $4) RETURNING id, name, found_id as "foundID", phone, email',
-      [name, foundID, phone, email]
+    await pool.query(
+      "INSERT INTO email_otps (email, otp, expires_at) VALUES ($1,$2,$3)",
+      [email, otp, expiresAt]
     );
 
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Error creating found ID:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    await transporter.sendMail({
+      from: `"AAU Lost ID System" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}. It expires in 5 minutes.`
+    });
+
+    res.json({ message: "OTP sent successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to send OTP" });
   }
 });
 
-// ==================== LOST IDs ENDPOINTS ====================
-
-// GET all lost IDs
-app.get('/lostIDs', async (req, res) => {
+/* VERIFY OTP */
+app.post("/verify-otp", async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, name, student_id as "studentID", phone, email, created_at FROM lost_ids ORDER BY created_at DESC'
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching lost IDs:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// POST new lost ID
-app.post('/lostIDs', async (req, res) => {
-  try {
-    const { name, studentID, phone, email } = req.body;
-
-    if (!name || !studentID || !phone || !email) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    const { email, otp } = req.body;
 
     const result = await pool.query(
-      'INSERT INTO lost_ids (name, student_id, phone, email) VALUES ($1, $2, $3, $4) RETURNING id, name, student_id as "studentID", phone, email',
-      [name, studentID, phone, email]
+      `SELECT * FROM email_otps
+       WHERE email=$1 AND otp=$2
+       ORDER BY created_at DESC LIMIT 1`,
+      [email, otp]
     );
 
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Error creating lost ID:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    if (result.rows.length === 0)
+      return res.status(400).json({ error: "Invalid OTP" });
+
+    if (new Date(result.rows[0].expires_at) < new Date())
+      return res.status(400).json({ error: "OTP expired" });
+
+    res.json({ message: "OTP verified" });
+  } catch (err) {
+    res.status(500).json({ error: "Verification failed" });
   }
 });
 
-// ==================== SUSPENDED STUDENTS ENDPOINTS ====================
+/* ================= LOST IDs ================= */
 
-// GET all suspended students
-app.get('/suspendedStudents', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, name, student_id as "studentID", email, phone, status FROM suspended_students ORDER BY created_at DESC'
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching suspended students:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+app.get("/lostIDs", async (req, res) => {
+  const result = await pool.query(
+    `SELECT id, name, student_id AS "studentID", phone, email, created_at
+     FROM lost_ids ORDER BY created_at DESC`
+  );
+  res.json(result.rows);
 });
 
-// POST new suspended student (for admin use)
-app.post('/suspendedStudents', async (req, res) => {
-  try {
-    const { name, studentID, email, phone, status } = req.body;
+app.post("/lostIDs", async (req, res) => {
+  const { name, studentID, phone, email } = req.body;
+  if (!name || !studentID || !phone || !email)
+    return res.status(400).json({ error: "Missing fields" });
 
-    if (!name || !studentID || !email || !phone) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+  const result = await pool.query(
+    `INSERT INTO lost_ids (name, student_id, phone, email)
+     VALUES ($1,$2,$3,$4)
+     RETURNING id, name, student_id AS "studentID", phone, email`,
+    [name, studentID, phone, email]
+  );
 
-    const result = await pool.query(
-      'INSERT INTO suspended_students (name, student_id, email, phone, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, student_id as "studentID", email, phone, status',
-      [name, studentID, email, phone, status || 'Suspended']
-    );
-
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Error creating suspended student:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  res.status(201).json(result.rows[0]);
 });
 
-// ==================== REQUESTS ENDPOINTS ====================
+/* ================= FOUND IDs ================= */
 
-// GET all requests
-app.get('/requests', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, name, lost_id as "lostID", email, date, status, police_report as "policeReport" FROM requests ORDER BY date DESC'
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching requests:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+app.get("/foundIDs", async (req, res) => {
+  const result = await pool.query(
+    `SELECT id, name, found_id AS "foundID", phone, email, created_at
+     FROM found_ids ORDER BY created_at DESC`
+  );
+  res.json(result.rows);
 });
 
-// GET request by ID
-app.get('/requests/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query(
-      'SELECT id, name, lost_id as "lostID", email, date, status, police_report as "policeReport" FROM requests WHERE id = $1',
-      [id]
-    );
+app.post("/foundIDs", async (req, res) => {
+  const { name, foundID, phone, email } = req.body;
+  if (!name || !foundID || !phone || !email)
+    return res.status(400).json({ error: "Missing fields" });
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Request not found' });
-    }
+  const result = await pool.query(
+    `INSERT INTO found_ids (name, found_id, phone, email)
+     VALUES ($1,$2,$3,$4)
+     RETURNING id, name, found_id AS "foundID", phone, email`,
+    [name, foundID, phone, email]
+  );
 
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Error fetching request:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  res.status(201).json(result.rows[0]);
 });
 
-// POST new request
-app.post('/requests', async (req, res) => {
-  try {
-    const { name, lostID, email, date, status, policeReport } = req.body;
+/* ================= REQUESTS ================= */
 
-    if (!name || !lostID || !email || !policeReport) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const result = await pool.query(
-      'INSERT INTO requests (name, lost_id, email, date, status, police_report) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, lost_id as "lostID", email, date, status, police_report as "policeReport"',
-      [name, lostID, email, date || new Date(), status || 'pending', policeReport]
-    );
-
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Error creating request:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+app.get("/requests", async (req, res) => {
+  const result = await pool.query(
+    `SELECT id, name, lost_id AS "lostID", email, date, status,
+            police_report AS "policeReport"
+     FROM requests ORDER BY date DESC`
+  );
+  res.json(result.rows);
 });
 
-// PATCH request status (approve/update)
-app.patch('/requests/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
+app.post("/requests", async (req, res) => {
+  const { name, lostID, email, policeReport } = req.body;
+  if (!name || !lostID || !email || !policeReport)
+    return res.status(400).json({ error: "Missing fields" });
 
-    if (!status) {
-      return res.status(400).json({ error: 'Status is required' });
-    }
+  const result = await pool.query(
+    `INSERT INTO requests (name, lost_id, email, police_report)
+     VALUES ($1,$2,$3,$4)
+     RETURNING *`,
+    [name, lostID, email, policeReport]
+  );
 
-    const result = await pool.query(
-      'UPDATE requests SET status = $1 WHERE id = $2 RETURNING id, name, lost_id as "lostID", email, date, status, police_report as "policeReport"',
-      [status, id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Request not found' });
-    }
-
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Error updating request:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  res.status(201).json(result.rows[0]);
 });
 
-// DELETE request (optional)
-app.delete('/requests/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('DELETE FROM requests WHERE id = $1 RETURNING id', [id]);
+app.patch("/requests/:id", async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Request not found' });
-    }
+  const result = await pool.query(
+    "UPDATE requests SET status=$1 WHERE id=$2 RETURNING *",
+    [status, id]
+  );
 
-    res.json({ message: 'Request deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting request:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  res.json(result.rows[0]);
 });
 
-// Start server
+/* ================= SUSPENDED STUDENTS ================= */
+
+app.get("/suspendedStudents", async (req, res) => {
+  const result = await pool.query(
+    `SELECT id, name, student_id AS "studentID",
+            email, phone, status
+     FROM suspended_students`
+  );
+  res.json(result.rows);
+});
+
+/* ================= START SERVER ================= */
+
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
-
