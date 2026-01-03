@@ -22,41 +22,45 @@ let healthChecker = (req, res) => {
 let signUpFunction = async (req, res) => {
     try {
         // first check if all the info is present
+        console.log("The request is called" , req.body)
         let sentInfo = req.body;
-        // sentInfo = { username , email , password }
-        console.log("Front End sent info ", sentInfo)
-        let isSomeThingWrong = false;
-        let emailRegExp = new RegExp("^[a-zA-Z0-9!#$%&*+/=?^_`{|}~'-]+(\\.[a-zA-Z0-9!#$%&*+/=?^_`{|}~'-]+)*@(yahoo|outlook|gmail)\\.com$");
+        // sentInfo = { id , role , email , password }
+        // console.log("Front End sent info ", sentInfo)
+        // let isSomeThingWrong = false;
+        // let emailRegExp = new RegExp("^[a-zA-Z0-9!#$%&*+/=?^_`{|}~'-]+(\\.[a-zA-Z0-9!#$%&*+/=?^_`{|}~'-]+)*@(yahoo|outlook|gmail)\\.com$");
 
 
-        if (!sentInfo.username || !sentInfo.email || !sentInfo.password) {
-            // then there is an error - missing required fields
-            isSomeThingWrong = true;
-        }
+        // if (!sentInfo.username || !sentInfo.email || !sentInfo.password) {
+        //     // then there is an error - missing required fields
+        //     isSomeThingWrong = true;
+        // }
 
-        // Check email format - if email exists but doesn't match pattern, mark as wrong
-        if (sentInfo.email && !emailRegExp.test(sentInfo.email)) {
-            isSomeThingWrong = true;
-        }
+        // // Check email format - if email exists but doesn't match pattern, mark as wrong
+        // if (sentInfo.email && !emailRegExp.test(sentInfo.email)) {
+        //     isSomeThingWrong = true;
+        // }
         // in the regexp true - correct email false - wrong email
 
-        if (isSomeThingWrong) {
-            // then return immediately
-            res.status(400).send("Make sure you are inputting all the required information in the correct format");
-            return;
-        }
+        // if (isSomeThingWrong) {
+        //     // then return immediately
+        //     res.status(400).send("Make sure you are inputting all the required information in the correct format");
+        //     return;
+        // }
 
         // else 
+
+
         // then do the user creation process    
         let user = await signUpService.userSignUp({
-            username: sentInfo.username,
+            id_number : sentInfo.id,
             email: sentInfo.email,
-            password: sentInfo.password
+            password: sentInfo.password,
+            role : sentInfo.role
         })
         // user will be true(created successfully) or false(already exists) 
 
 
-        console.log(user)
+        // console.log(user)
         if (user.success) {
             res.status(201).json({ userCreated: true });
         }
@@ -156,9 +160,9 @@ let signOutFunction = async (req, res) => {
     // using jwt-decode
     try {
         // when the user signs out send the refreshToken
-        let { refreshToken } = req.body;
+        let decodedRefreshToken = req.decodedRefresh;
 
-        let result = await LogInLogOutSignOutHandler.SignOut({ refreshToken });
+        let result = await LogInLogOutSignOutHandler.SignOut( decodedRefreshToken );
         // controller sends the refreshToken , service layer - decodes it , model - does the actual invalidation
 
         if (result.success) {
@@ -169,8 +173,36 @@ let signOutFunction = async (req, res) => {
         }
 
     } catch (err) {
-        console.log("Error from /signOut route ", err.message);
+        console.log("Error from /signOut route ", err);
         res.status(500).json({ error: "Internal server error" });
+    }
+
+}
+
+
+let resendOtp = async (req, res) => {
+    try {
+        // re emit the event 
+        // the event requires info like
+        // so front end sends email to this route
+        // send in the email
+        let { email } = req.body;
+        let result = await signUpService.resendOtp({ email });
+
+        // this updates the otp and sends email
+        console.log(result)
+
+        if (result.success) {
+            res.status(200).send("Otp Verification successfully sent")
+        } else {
+            // if any error
+            res.status(400).send(result.reason)
+        }
+
+    } catch (err) {
+        console.log("Error from the controller side ", err.message);
+        res.status(500).send("Internal error happened");
+
     }
 
 }
@@ -185,7 +217,8 @@ module.exports = {
     signUpFunction,
     verifyOtpFunction,
     logInFunction,
-    signOutFunction
+    signOutFunction,
+    resendOtp
 }
 
 

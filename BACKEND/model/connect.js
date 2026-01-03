@@ -8,7 +8,7 @@ const path = require('path');
 
 
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 // we need to store our password and this things in a secret place
 
 

@@ -10,7 +10,7 @@ const crypto = require('crypto');
 
 const { retrieveRefTokenInfo } = require('../model/RefreshTableModel.js')
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
+dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 
 let { puttingInfoIntoRefTokenInfo } = require('../model/userSignUpModel.js')
@@ -88,7 +88,7 @@ async function createRefreshToken(sentInfo) {
 
         // one user single account but on diff devices how is that possible
 
-        console.log("sentInfo for the refresh token generator function : ", sentInfo.randomString)
+        // console.log("sentInfo for the refresh token generator function : ", sentInfo.randomString)
         // let id = uuidv4(); // this will be the id of the ref token
         // sentInfo.id = id;  // no id is req bc we will store the random string and that will be used to identify the user
 
@@ -106,7 +106,6 @@ async function createRefreshToken(sentInfo) {
         let sentToBeSigned = {
             exp : Date.now() / 1000 + twenty_days_from_now ,
             randomString : sentInfo.randomString ,  // then use that to get userID and invalid or valid
-            role
             // so backend can hash it and get the info abt the ref token when generating access token to retrieve the info 
             // from the database
         }; // this is what we send to the client
@@ -148,7 +147,7 @@ async function givenRefGenerateAccess(sentInfo) {
     // this needs to be called with the decodedRefresh
     // sentInfo = {exp ,randomString ,role}
     // so first hash the randomString and use that as a way to access the table row
-    let {exp ,randomString ,role} =  sentInfo
+    let { randomString } =  sentInfo
     let hashedTokenInfo = crypto.createHash("sha256").update(randomString).digest("hex");
 
     let result = await retrieveRefTokenInfo(hashedTokenInfo);

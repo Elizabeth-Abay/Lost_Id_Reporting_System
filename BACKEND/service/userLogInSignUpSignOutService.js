@@ -3,12 +3,12 @@
 // One for log in and sign Out
 // and instantiate and export objects from the two classes
 
-const { jwtDecode } = require('jwt-decode');
-
 const { givenEmailSelectPassword } = require('../model/userLogInModel.js');
 const { createAccessToken, createRefreshToken } = require('./AccessAndRefreshTokenGen.js');
 
 const { InvalidateRefreshToken } = require('../model/userSignOutModel.js');
+
+const { sendingOTPEmail } = require('./EmailAndAssociatedThings.js');
 
 
 
@@ -27,8 +27,8 @@ const EventEmitter = require('events'); // emit and listen for events for when u
 
 
 // to talk with the database u need a function defined from the model
-const { checkEmailIsVerifiedBefore, createPendingUser, checkTheOTPmatches, deleteUserFromPendingState } = require('../model/userSignUpModel.js')
-const { signUpEventListener } = require('../events/userSignUpListener.js');
+const { createPendingUser, checkTheOTPmatches, deleteUserFromPendingState , updateOTP } = require('../model/userSignUpModel.js')
+const { welcomingUsersUponSignUp } = require('../events/userSignUpListener.js');
 
 
 
@@ -38,15 +38,14 @@ class SignUpHandler extends EventEmitter {
 
     constructor() {
         super();
-        this.on('user_created', signUpEventListener);
+        this.on('user_created', welcomingUsersUponSignUp);
         // setting up thie listener
         // console.log(signUpEventListener);
     };
 
     async userSignUp(sentInfo) {
         try {
-
-            // sentInfo = { username , email , password }
+            // sentInfo = { id_number ,  role , email , password }
             // this is the function that will put the user inside the database
 
             // hash the password 
@@ -57,7 +56,7 @@ class SignUpHandler extends EventEmitter {
 
             // create otp 
             let OTP = otpGenerator.generate(
-                8, {
+                6, {
                 digits: true,
                 upperCaseAlphabets: true,
                 lowerCaseAlphabets: true
@@ -76,10 +75,11 @@ class SignUpHandler extends EventEmitter {
 
             // request the model to insert the user into pending
             let userPending = await createPendingUser({
-                username: sentInfo.username,
+                id_number: sentInfo. id_number,
                 email: sentInfo.email,
                 password_hashed: hashedPw,
-                otp_hashed: hashedOTP
+                otp_hashed: hashedOTP,
+                role : sentInfo.role,
             });
 
             // console.log(OTP);
@@ -93,12 +93,13 @@ class SignUpHandler extends EventEmitter {
                 // database then emit an event to notify listeners to send the email
 
 
+                // this part will send a welcome email upon sign up
                 this.emit('user_created', {
-                    username: sentInfo.username,
                     email: sentInfo.email,
-                    OTP
                 })
 
+                // and also send the otp
+                await sendingOTPEmail( { email : sentInfo.email , OTP })
 
                 return {
                     success: true
@@ -119,6 +120,65 @@ class SignUpHandler extends EventEmitter {
 
     }
 
+
+    // emit events bc it needs to resend the email
+    // this layer talks to the model to update the otp hashed
+    async resendOtp(sentInfo) {
+        try {
+            // sentInfo = { email }
+            let { email }  = sentInfo;
+            // then regenerate the OTP hash it and update it and then emit the event
+            let OTP = otpGenerator.generate(
+                6, {
+                digits: true,
+                upperCaseAlphabets: true,
+                lowerCaseAlphabets: true
+            }
+            );
+            let hashedOTP = crypto.createHash('sha1').update(OTP).digest('hex');
+            // digest vs to String 
+            // digest means finalize the hash
+            // toString means convert to string it wont finalize the hash
+
+            // then go to the model and update the hashed otp
+
+            sentInfo.OTP = hashedOTP;
+
+            let updatedUserOTP = await updateOTP(sentInfo);
+
+            // console.log("updatedUserOTP " , updatedUserOTP)
+            console.log("updatedUserOTP" , updatedUserOTP)
+
+            if (updatedUserOTP.success) {
+                // then resend the email
+
+                let otpSender = await sendingOTPEmail({email , OTP });
+                console.log(otpSender)
+
+                if (otpSender.success) {
+                    return {
+                        success: true
+                    }
+                }
+                // this can only return success or throw an error
+
+            } else {
+                return {
+                    success: false,
+                    reason: updatedUserOTP.reason
+                }
+            }
+
+        } catch (err) {
+            console.log("Error from resendOtp", err.message)
+            return {
+                success: false,
+                reason: err.message
+            }
+        }
+    }
+
+
     async ValidateOTPandGenerateTokens(sentInfo) {
         try {
             // sentInfo = { email , OTP }  ** the otp is sent unhashed
@@ -135,7 +195,7 @@ class SignUpHandler extends EventEmitter {
             if (doesOTPMatch.success) {
                 let dataReceived = doesOTPMatch.data;
                 // first delete OTP info from pending user
-                let verified = await deleteUserFromPendingState( dataReceived.id );
+                let verified = await deleteUserFromPendingState( {id : dataReceived.id} );
                 // then go on and generate access and refresh tokens
 
                 if (verified.success) {
@@ -191,10 +251,9 @@ class UserLogInSignOut {
         try {
             // sentInfo = {refreshToken}
             // when user signs out we just invalidate the refresh token from the backend
-            let { refreshToken } = sentInfo;
+            let { randomString } = sentInfo;
             // first decode the refresh token to get the randomString, then hash it to get token_hash
-            let decoded = jwtDecode(refreshToken);
-            let randomString = decoded.randomString;
+    
             let tokenHash = crypto.createHash("sha256").update(randomString).digest("hex");
 
             let result = await InvalidateRefreshToken(tokenHash);
@@ -228,11 +287,14 @@ class UserLogInSignOut {
 
             // then receive the password from the model
             let passwordHased = await givenEmailSelectPassword({ email });
+            // we first need to check if the user belongs to the correct email
+
 
             if (passwordHased.success) {
                 // ie the request was successful
                 // compare the password given with the hashed version
                 let passwordsMatch = await bcrypt.compare(password, passwordHased.data.password);
+                console.log("passwordsMatch" , passwordsMatch);
 
                 if (passwordsMatch) {
                     // generate and send the access and refresh token
@@ -266,7 +328,7 @@ class UserLogInSignOut {
                 return passwordHased;
             }
         } catch (err) {
-            console.log("UserLogInLogOutSignOut.LogIn Error :  ", err.message);
+            console.log("UserLogInLogOutSignOut.LogIn Error :  ", err);
             return {
                 success: false,
                 reason: "Error while UserLogInLogOutSignOut.LogIn "
@@ -286,13 +348,3 @@ let signUpService = new SignUpHandler();
 
 module.exports = { LogInLogOutSignOutHandler, signUpService }
 
-
-// async function hello() {
-//     console.log(await LogInLogOutSignOutHandler.LogIn({
-//         email: 'elizabethabay1@gmail.com',
-//         password: "OllaOlla"
-//     }))
-// }
-
-
-// hello()

@@ -8,10 +8,10 @@ const rateLimiter = require('express-rate-limit');
 // so that hackers won't be able to exhaust the server by sending the same request again and again
 
 
-const { healthChecker,signUpFunction , verifyOtpFunction , logInFunction , signOutFunction } = require('../controller/userSignUp.js');
+const { healthChecker,signUpFunction , verifyOtpFunction , logInFunction , signOutFunction , resendOtp} = require('../controller/userSignUp.js');
 
 const { GivenRefTokenGenAccessToken } = require('../controller/givenRefGenerateAccessToken.js');
-const { CheckHealth } = require('../middleware/ForGeneratingAccessTokenFromRefToken.js');
+const { CheckHealthOfRefreshToken } = require('../middleware/ForGeneratingAccessTokenFromRefToken.js');
 
 
 let rateLimiterForSignUp = rateLimiter({
@@ -38,10 +38,13 @@ LogInAndSignUpRouter.post('/verifyOtp' , verifyOtpFunction );
 
 LogInAndSignUpRouter.post('/logIn' , logInFunction );
 
-LogInAndSignUpRouter.post('/signOut' , signOutFunction );
+LogInAndSignUpRouter.post('/signOut' ,  CheckHealthOfRefreshToken  , signOutFunction );
 
-LogInAndSignUpRouter.post('/generateAccessToken' ,  CheckHealth , GivenRefTokenGenAccessToken);
+LogInAndSignUpRouter.post('/generateAccessToken' ,  CheckHealthOfRefreshToken , GivenRefTokenGenAccessToken);
 // the middleware first checks if the ref token is correct and then sets the decodedRefresh as a request prop
+
+
+LogInAndSignUpRouter.post('/resendOtp' , resendOtp);
 
 
 

@@ -3,7 +3,7 @@ const { pool } = require('./connect.js');
 
 async function retrieveRefTokenInfo(hashedTokenInfo) {
     try{
-        let result = await pool.query('SELECT user_id , user_role , is_valid FROM refresh_token_info WHERE token_hash = $1' , [hashedTokenInfo]);
+        let result = await pool.query('SELECT user_id , user_role , isValid FROM refreshToken WHERE token_hash = $1' , [hashedTokenInfo]);
 
         let infoSelected = result.rows[0];
 

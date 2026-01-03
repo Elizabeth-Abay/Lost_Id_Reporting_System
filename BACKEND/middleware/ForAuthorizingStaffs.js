@@ -28,5 +28,15 @@ function isStaff(req, res, next) {
 } 
 
 
-module.exports = { isStaff }
+function declineNonStaffUsers(req , res , next){
+	if (!req.staff){
+		return res.status(401).json({message : "unauthorized attempt"});
+		return;
+	}
+
+	return next()
+}
+
+
+module.exports = { isStaff , declineNonStaffUsers}
 // import this middleware to use it for checking if users are properly authorized

@@ -2,20 +2,21 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const path = require('path');
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-function CheckHealthOfToken(req, res, next) {
+function CheckHealthOfRefreshToken(req, res, next) {
 	// from the request body take and check the health of ref token
 	// first signed by me and is it expired
 
-	let refToken = req.body.refreshToken;
+	let { refreshToken } = req.body;
 
 	try {
-		let decodedRefresh = jwt.verify(refToken, process.env.REFRESH_TOKEN_SECRET);
+		let decodedRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 		// it returns the decoded info if the refreshToken is valid
-		// it throws an error if the refToken has sthg wrong with it
+		// it throws an error if the refreshToken has sthg wrong with it
 
 		// ie if there is a value then set the decoded
+		// decodedRefresh = { randomString }
 		req.decodedRefresh = decodedRefresh;
 		return next();
 	} catch (err) {
@@ -71,7 +72,8 @@ function CheckHealthOfAccessToken(req, res, next) {
 		console.log(err.message);
 		if (err.name === 'TokenExpiredError') {
 			// then notify the front end to send a post request with the refresh token
-			res.json({
+			// means token is expired
+			res.status(403).json({
 				success: false,
 				reason: 'Token Expired'
 			});
@@ -80,7 +82,8 @@ function CheckHealthOfAccessToken(req, res, next) {
 
 		else if (err.name === 'JsonWebTokenError') {
 			// then invalid token
-			res.json({
+			// 401 means token has been tampered with
+			res.status(401).json({
 				success: false,
 				reason: 'Invalid Token'
 			})
@@ -95,4 +98,4 @@ function CheckHealthOfAccessToken(req, res, next) {
 
 
 
-module.exports = { CheckHealth: CheckHealthOfToken, CheckHealthOfAccessToken }
+module.exports = {  CheckHealthOfRefreshToken, CheckHealthOfAccessToken }
