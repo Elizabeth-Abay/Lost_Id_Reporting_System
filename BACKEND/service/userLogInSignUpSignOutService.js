@@ -27,7 +27,7 @@ const EventEmitter = require('events'); // emit and listen for events for when u
 
 
 // to talk with the database u need a function defined from the model
-const { createPendingUser, checkTheOTPmatches, deleteUserFromPendingState , updateOTP } = require('../model/userSignUpModel.js')
+const { createPendingUser, checkTheOTPmatches, deleteUserFromPendingState, updateOTP } = require('../model/userSignUpModel.js')
 const { welcomingUsersUponSignUp } = require('../events/userSignUpListener.js');
 
 
@@ -47,6 +47,7 @@ class SignUpHandler extends EventEmitter {
         try {
             // sentInfo = { id_number ,  role , email , password }
             // this is the function that will put the user inside the database
+            console.log("userSignUp is called with ", sentInfo)
 
             // hash the password 
             let saltgen = await bcrypt.genSalt();
@@ -63,6 +64,7 @@ class SignUpHandler extends EventEmitter {
             }
             ); // the otp has 8 digits and has got all the object's types
 
+            console.log("OTP generated ", OTP);
 
 
 
@@ -75,11 +77,13 @@ class SignUpHandler extends EventEmitter {
 
             // request the model to insert the user into pending
             let userPending = await createPendingUser({
-                id_number: sentInfo. id_number,
+                name : sentInfo.name,
+                id_number: sentInfo.id_number,
                 email: sentInfo.email,
                 password_hashed: hashedPw,
                 otp_hashed: hashedOTP,
-                role : sentInfo.role,
+                role: sentInfo.role,
+                department : sentInfo.department
             });
 
             // console.log(OTP);
@@ -99,11 +103,20 @@ class SignUpHandler extends EventEmitter {
                 })
 
                 // and also send the otp
-                await sendingOTPEmail( { email : sentInfo.email , OTP })
+                let res = await sendingOTPEmail({ email: sentInfo.email, OTP })
 
+                if (res.success) {
+                    return {
+                        success: true
+                    }
+                } 
+                
                 return {
-                    success: true
+                    success : false,
+                    reason : "Error while sending email"
                 }
+
+
             }
 
             return userPending;
@@ -126,7 +139,7 @@ class SignUpHandler extends EventEmitter {
     async resendOtp(sentInfo) {
         try {
             // sentInfo = { email }
-            let { email }  = sentInfo;
+            let { email } = sentInfo;
             // then regenerate the OTP hash it and update it and then emit the event
             let OTP = otpGenerator.generate(
                 6, {
@@ -147,12 +160,12 @@ class SignUpHandler extends EventEmitter {
             let updatedUserOTP = await updateOTP(sentInfo);
 
             // console.log("updatedUserOTP " , updatedUserOTP)
-            console.log("updatedUserOTP" , updatedUserOTP)
+            console.log("updatedUserOTP", updatedUserOTP)
 
             if (updatedUserOTP.success) {
                 // then resend the email
 
-                let otpSender = await sendingOTPEmail({email , OTP });
+                let otpSender = await sendingOTPEmail({ email, OTP });
                 console.log(otpSender)
 
                 if (otpSender.success) {
@@ -195,23 +208,24 @@ class SignUpHandler extends EventEmitter {
             if (doesOTPMatch.success) {
                 let dataReceived = doesOTPMatch.data;
                 // first delete OTP info from pending user
-                let verified = await deleteUserFromPendingState( {id : dataReceived.id} );
+                let verified = await deleteUserFromPendingState({ id: dataReceived.id });
                 // then go on and generate access and refresh tokens
 
                 if (verified.success) {
                     // Default role to "user" - you may want to retrieve this from database in the future
-                    let role = dataReceived.role; // needs to come from the user now
+                    let role = dataReceived.role; 
                     let randomString = crypto.randomBytes(64).toString("hex"); // Generate random string for refresh token
-                    
-                    let accessToken = createAccessToken({ userId: dataReceived.id , role });
 
-                    let refreshToken = await createRefreshToken({ userId: dataReceived.id , randomString , role });
+                    let accessToken = createAccessToken({ userId: dataReceived.id, role });
+
+                    let refreshToken = await createRefreshToken({ userId: dataReceived.id, randomString, role });
 
                     return {
                         success: true,
                         data: {
                             accessToken: accessToken.data,
-                            refreshToken: refreshToken.data
+                            refreshToken: refreshToken.data,
+                            role 
                         }
                     }
 
@@ -253,7 +267,7 @@ class UserLogInSignOut {
             // when user signs out we just invalidate the refresh token from the backend
             let { randomString } = sentInfo;
             // first decode the refresh token to get the randomString, then hash it to get token_hash
-    
+
             let tokenHash = crypto.createHash("sha256").update(randomString).digest("hex");
 
             let result = await InvalidateRefreshToken(tokenHash);
@@ -294,7 +308,7 @@ class UserLogInSignOut {
                 // ie the request was successful
                 // compare the password given with the hashed version
                 let passwordsMatch = await bcrypt.compare(password, passwordHased.data.password);
-                console.log("passwordsMatch" , passwordsMatch);
+                console.log("passwordsMatch", passwordsMatch);
 
                 if (passwordsMatch) {
                     // generate and send the access and refresh token
@@ -304,13 +318,14 @@ class UserLogInSignOut {
                     let randomString = crypto.randomBytes(64).toString("hex"); // Generate random string for refresh token
 
                     let accessToken = createAccessToken({ userId, role });
-                    let refreshToken = await createRefreshToken({ userId, randomString, role});
+                    let refreshToken = await createRefreshToken({ userId, randomString, role });
 
                     return {
                         success: true,
                         data: {
                             accessToken: accessToken.data,
-                            refreshToken: refreshToken.data
+                            refreshToken: refreshToken.data,
+                            role
                         }
                     }
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         :root {
             --primary-blue: #1e3a8a;
             --dark-blue: #0f1a3f;
@@ -24,7 +25,7 @@
             --black: #0f172a;
             --shadow: 0 10px 25px rgba(15, 26, 63, 0.1);
         }
-        
+
         body {
             background-color: var(--off-white);
             color: var(--black);
@@ -35,7 +36,7 @@
             position: relative;
             overflow-x: hidden;
         }
-        
+
         /* 3D Background Elements */
         .bg-shape {
             position: absolute;
@@ -45,7 +46,7 @@
             z-index: -1;
             filter: blur(20px);
         }
-        
+
         .bg-shape-1 {
             width: 400px;
             height: 400px;
@@ -53,7 +54,7 @@
             left: -150px;
             animation: float 15s ease-in-out infinite;
         }
-        
+
         .bg-shape-2 {
             width: 300px;
             height: 300px;
@@ -61,7 +62,7 @@
             right: -100px;
             animation: float 18s ease-in-out infinite reverse;
         }
-        
+
         /* Main Container */
         .main {
             display: flex;
@@ -76,7 +77,7 @@
             perspective: 1000px;
             animation: fadeIn 0.8s ease-out;
         }
-        
+
         /* Left side with branding */
         .word {
             flex: 1;
@@ -88,42 +89,42 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .word::before {
             content: '';
             position: absolute;
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             top: -100px;
             right: -100px;
             border-radius: 50%;
         }
-        
+
         .word::after {
             content: '';
             position: absolute;
             width: 200px;
             height: 200px;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
             bottom: -80px;
             left: -80px;
             border-radius: 50%;
         }
-        
+
         .logo-container {
             position: relative;
             z-index: 2;
             margin-bottom: 40px;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
         }
-        
+
         .logo-icon {
             width: 60px;
             height: 60px;
@@ -135,19 +136,19 @@
             backdrop-filter: blur(5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
-        
+
         .logo-icon i {
             font-size: 28px;
             color: white;
         }
-        
+
         .logo-text {
             color: white;
             font-size: 2rem;
             font-weight: 800;
             letter-spacing: -0.5px;
         }
-        
+
         .slogan {
             color: rgba(255, 255, 255, 0.9);
             font-size: 1.4rem;
@@ -155,20 +156,20 @@
             margin-bottom: 10px;
             line-height: 1.4;
         }
-        
+
         .sub-slogan {
             color: rgba(255, 255, 255, 0.7);
             font-size: 1rem;
             line-height: 1.6;
             max-width: 400px;
         }
-        
+
         .features {
             margin-top: 50px;
             position: relative;
             z-index: 2;
         }
-        
+
         .feature {
             display: flex;
             align-items: center;
@@ -176,7 +177,7 @@
             margin-bottom: 25px;
             color: rgba(255, 255, 255, 0.9);
         }
-        
+
         .feature-icon {
             width: 40px;
             height: 40px;
@@ -187,7 +188,7 @@
             justify-content: center;
             font-size: 18px;
         }
-        
+
         /* Right side with form */
         .container {
             flex: 1;
@@ -198,7 +199,7 @@
             position: relative;
             transform-style: preserve-3d;
         }
-        
+
         .welcome-text {
             font-size: 2rem;
             color: var(--dark-blue);
@@ -206,28 +207,28 @@
             margin-bottom: 10px;
             line-height: 1.2;
         }
-        
+
         .sub-text {
             color: var(--gray);
             margin-bottom: 40px;
             font-size: 1.1rem;
             line-height: 1.6;
         }
-        
+
         form {
             width: 100%;
             max-width: 400px;
         }
-        
+
         .form-group {
             margin-bottom: 25px;
             position: relative;
         }
-        
+
         .roles {
             margin-bottom: 25px;
         }
-        
+
         select {
             width: 100%;
             padding: 18px 20px;
@@ -241,18 +242,18 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
         }
-        
+
         select:focus {
             outline: none;
             border-color: var(--light-blue);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
         }
-        
+
         .select-wrapper {
             position: relative;
         }
-        
+
         .select-wrapper::after {
             content: '\f078';
             font-family: 'Font Awesome 6 Free';
@@ -264,7 +265,7 @@
             color: var(--gray);
             pointer-events: none;
         }
-        
+
         input {
             width: 100%;
             padding: 18px 20px;
@@ -276,25 +277,25 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
         }
-        
+
         input:focus {
             outline: none;
             border-color: var(--light-blue);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
         }
-        
+
         input::placeholder {
             color: var(--gray);
         }
-        
+
         .buttons-wrapper {
             display: flex;
             gap: 15px;
             margin-top: 30px;
             margin-bottom: 30px;
         }
-        
+
         button {
             flex: 1;
             padding: 18px;
@@ -307,36 +308,36 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
             transform-style: preserve-3d;
         }
-        
+
         #reset {
             background-color: #f1f5f9;
             color: var(--dark-blue);
         }
-        
+
         #reset:hover {
             background-color: #e2e8f0;
             transform: translateY(-3px) translateZ(10px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
         }
-        
+
         #login {
             background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
             color: white;
         }
-        
+
         #login:hover {
             background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
             transform: translateY(-3px) translateZ(10px);
             box-shadow: 0 10px 20px rgba(30, 58, 138, 0.2);
         }
-        
+
         #rep {
             color: var(--gray);
             margin-bottom: 10px;
             text-align: center;
             font-size: 0.95rem;
         }
-        
+
         #report {
             display: block;
             text-align: center;
@@ -349,13 +350,13 @@
             background-color: rgba(59, 130, 246, 0.05);
             margin-top: 5px;
         }
-        
+
         #report:hover {
             background-color: rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
             text-decoration: underline;
         }
-        
+
         /* 3D Card Effect */
         .container::before {
             content: '';
@@ -369,19 +370,36 @@
             z-index: -1;
             transform: translateZ(-20px);
         }
-        
+
         /* Animations */
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(20px, -20px) rotate(5deg); }
-            66% { transform: translate(-15px, 15px) rotate(-5deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(20px, -20px) rotate(5deg);
+            }
+
+            66% {
+                transform: translate(-15px, 15px) rotate(-5deg);
+            }
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         /* Responsive Design */
         @media (max-width: 900px) {
             .main {
@@ -390,49 +408,52 @@
                 margin: 20px;
                 max-width: 500px;
             }
-            
-            .word, .container {
+
+            .word,
+            .container {
                 padding: 40px 30px;
             }
-            
+
             .word {
                 padding-bottom: 40px;
             }
-            
+
             .features {
                 display: none;
             }
         }
-        
+
         @media (max-width: 480px) {
             .main {
                 margin: 10px;
                 border-radius: 20px;
             }
-            
-            .word, .container {
+
+            .word,
+            .container {
                 padding: 30px 20px;
             }
-            
+
             .welcome-text {
                 font-size: 1.7rem;
             }
-            
+
             .buttons-wrapper {
                 flex-direction: column;
             }
-            
+
             .logo-text {
                 font-size: 1.7rem;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Background 3D Shapes -->
     <div class="bg-shape bg-shape-1"></div>
     <div class="bg-shape bg-shape-2"></div>
-    
+
     <div class="main">
         <!-- Left Side - Branding -->
         <div class="word">
@@ -446,7 +467,7 @@
                 <div class="slogan">No more long queues!</div>
                 <div class="sub-slogan">Replace your lost ID the smart way with our automated system.</div>
             </div>
-            
+
             <div class="features">
                 <div class="feature">
                     <div class="feature-icon">
@@ -468,155 +489,47 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Side - Login Form -->
         <div class="container">
             <h2 class="welcome-text">Lost ID Request</h2>
             <p class="sub-text">Log in to report or track your lost ID card</p>
-            
+
             <form id="loginForm">
-                <div class="roles">
-                    <div class="select-wrapper">
-                        <select id="Role" class="jsRole" name = "role">
-                            <option value="Staff">Staff</option>
-                            <option value="Student" selected>Student</option>
-                        </select>
-                    </div>
-                    <div class="js-staff"></div>
-                </div>
-                
-                <div class="form-group">
+
+                <!-- <div class="form-group">
                     <input class="js-id" type="text" id="ID" placeholder="University ID" required>
-                </div>
-                
+                </div> -->
+
                 <div class="form-group">
-                    <input type="email" id="Email" placeholder="xyz@aau.edu.et" required>
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" name="email" id="email" placeholder="xyz@aau.edu.et" required />
                 </div>
-                
+
                 <div class="form-group">
-                    <input type="password" id="Password" placeholder="Email Password" required minlength="6" maxlength="15">
+                    <label class="form-label">
+                        <i class="fas fa-key"></i> Password
+                    </label>
+                    <input type="password" name="password" id="password" placeholder="Minimum 6 characters" required
+                        minlength="6" />
                 </div>
-                
+
                 <div class="buttons-wrapper">
                     <button id="reset" type="button">Reset</button>
-                    <button id="login" type="button" class="js-login">Login</button>
+                    <button id="login" type="submit" class="js-login">Login</button>
                 </div>
-                
+
                 <p id="rep">Found someone's ID?</p>
                 <a href="report.html" target="_blank" id="report">Report Here</a>
             </form>
         </div>
     </div>
-    
-    <script type="module">
-        // Add interactive 3D effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const mainContainer = document.querySelector('.main');
-            const inputs = document.querySelectorAll('input, select');
-            const buttons = document.querySelectorAll('button');
-            
-            // Add 3D hover effect to main container
-            mainContainer.addEventListener('mousemove', function(e) {
-                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-                
-                mainContainer.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-            });
-            
-            mainContainer.addEventListener('mouseleave', function() {
-                mainContainer.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-                mainContainer.style.transition = 'transform 0.5s ease';
-            });
-            
-            mainContainer.addEventListener('mouseenter', function() {
-                mainContainer.style.transition = 'none';
-            });
-            
-            // Add focus effects to form inputs
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'translateZ(10px)';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'translateZ(0)';
-                });
-            });
-            
-            // Button click effects
-            buttons.forEach(button => {
-                button.addEventListener('mousedown', function() {
-                    this.style.transform = 'translateY(0) translateZ(5px) scale(0.98)';
-                });
-                
-                button.addEventListener('mouseup', function() {
-                    this.style.transform = 'translateY(-3px) translateZ(10px)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) translateZ(0)';
-                });
-            });
-            
-            // Form reset functionality
-            document.getElementById('reset').addEventListener('click', function() {
-                document.getElementById('loginForm').reset();
-                inputs.forEach(input => {
-                    input.style.transform = 'translateY(0)';
-                    input.parentElement.style.transform = 'translateZ(0)';
-                });
-            });
-            
-            // Login button functionality
-            document.querySelector('.js-login').addEventListener('click', function() {
-                const id = document.getElementById('ID').value;
-                const email = document.getElementById('Email').value;
-                const password = document.getElementById('Password').value;
-                const role = document.getElementById('Role').value;
-                
-                // Simple validation
-                if (!id || !email || !password) {
-                    alert('Please fill in all fields');
-                    return;
-                }
-                
-                // if (!email.includes('@aau.edu.et')) {
-                //     alert('Please use a valid AAU email address');
-                //     return;
-                // }
-                
-                // Simulate login process
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-                this.disabled = true;
-                
-                setTimeout(() => {
-                    this.innerHTML = 'Login Successful!';
-                    this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                    
-                    // Redirect after successful login (simulated)
-                    setTimeout(() => {
-                        alert(`Welcome ${role}: ${id}\nYou will be redirected to the dashboard.`);
-                        // In real implementation, you would redirect here
-                        // window.location.href = 'dashboard.html';
-                    }, 500);
-                }, 1500);
-            });
-            
-            // Role change effect
-            document.getElementById('Role').addEventListener('change', function() {
-                const staffField = document.querySelector('.js-staff');
-                
-                if (this.value === 'Staff') {
-                    staffField.innerHTML = `
-                        <div class="form-group" style="margin-top: 15px; animation: fadeIn 0.5s ease-out;">
-                            <input type="text" placeholder="Department" required>
-                        </div>
-                    `;
-                } else {
-                    staffField.innerHTML = '';
-                }
-            });
-        });
-    </script>
+
+
+
+    <script type="module" src="app.js"></script>
 </body>
+
 </html>

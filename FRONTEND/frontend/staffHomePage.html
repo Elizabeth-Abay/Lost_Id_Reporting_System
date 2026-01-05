@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff Home</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #4768c3, #c4c1c1);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .home-container {
+      background-color: white;
+      width: 90%;
+      max-width: 420px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      padding: 30px 25px;
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+
+    .home-container h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .home-container p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    .action-btn {
+      width: 90%;
+      height: 46px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #5561ff, #00c2a8);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(85,97,255,0.15);
+      transition: transform .12s ease, box-shadow .12s ease;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(85,97,255,0.18);
+    }
+
+    .secondary-btn {
+      background: #004aad;
+      box-shadow: none;
+    }
+
+    .secondary-btn:hover {
+      background: #0066cc;
+      transform: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .home-container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="home-container">
+    <h2>Staff Dashboard</h2>
+    <p>Manage student ID requests below</p>
+
+    <button class="action-btn">Pending Requests</button>
+    <button class="action-btn secondary-btn">Already Approved</button>
+    <button class="action-btn">Rejected Requests</button>
+  </div>
+
+</body>
+</html>

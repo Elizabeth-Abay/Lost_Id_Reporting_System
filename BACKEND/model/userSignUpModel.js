@@ -40,19 +40,29 @@ async function checkEmailIsVerifiedBefore(email) {
 
 async function createPendingUser(userInformation) {
     try {
-        // userInformation = { username , email , password_hashed , otp_hashed}
-        let { id_number, email, password_hashed, otp_hashed, role } = userInformation;
+        // userInformation = { name , email , password_hashed , otp_hashed}
+        console.log("createPendingUser called with " , userInformation)
+        let { id_number, email, password_hashed, otp_hashed, role  , name , department} = userInformation;
 
         let isUserDuplicateEmail = await checkEmailIsVerifiedBefore(email);
+        console.log("checkEmailIsVerifiedBefore " , isUserDuplicateEmail)
         // here successs means u can go on to create
         // then this will mean there wont be 2 users with the same email
 
         if (isUserDuplicateEmail?.success) {
             let userPending = await pool.query(
-                'INSERT INTO pendingUsers(id_number , email , password , role , otpHashed) VALUES( $1 , $2 , $3 , $4 , $5)',
-                [id_number, email, password_hashed, role , otp_hashed]
+                'INSERT INTO pendingUsers(id_number , email , password , role , otpHashed , name , department) VALUES( $1 , $2 , $3 , $4 , $5 , $6 , $7)',
+                [id_number, email, password_hashed, role , otp_hashed , name , department]
             );
 
+            if (userPending.rowCount === 0){
+                return {
+                    success : false,
+                    reason : "User not created"
+                }
+            }
+
+            
             console.log("User is created")
             return {
                 success: true

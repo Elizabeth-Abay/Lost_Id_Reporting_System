@@ -53,11 +53,14 @@ async function sendingOTPEmail(emailInfo) {
             html: `<b>OTP IS ${OTP} </b>`
         }
 
-        await emailTransporter.sendMail(emailSentOut);
+        let result = await emailTransporter.sendMail(emailSentOut);
         // this returns a promise 
         // resolve - then email will be sent
         // error thrown then thrown error will be caught by the caller 
         // unless an error happens then successful
+
+
+        console.log("result from emailTransporter " , result)
         return {
             success: true // this is for a consistent format
         }

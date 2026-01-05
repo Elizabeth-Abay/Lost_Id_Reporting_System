@@ -22,45 +22,27 @@ let healthChecker = (req, res) => {
 let signUpFunction = async (req, res) => {
     try {
         // first check if all the info is present
-        console.log("The request is called" , req.body)
+        console.log("The request is called" , req.body);
         let sentInfo = req.body;
-        // sentInfo = { id , role , email , password }
-        // console.log("Front End sent info ", sentInfo)
-        // let isSomeThingWrong = false;
-        // let emailRegExp = new RegExp("^[a-zA-Z0-9!#$%&*+/=?^_`{|}~'-]+(\\.[a-zA-Z0-9!#$%&*+/=?^_`{|}~'-]+)*@(yahoo|outlook|gmail)\\.com$");
+        // sentInfo = { id , role , email , password , name , department - for students}
 
 
-        // if (!sentInfo.username || !sentInfo.email || !sentInfo.password) {
-        //     // then there is an error - missing required fields
-        //     isSomeThingWrong = true;
-        // }
-
-        // // Check email format - if email exists but doesn't match pattern, mark as wrong
-        // if (sentInfo.email && !emailRegExp.test(sentInfo.email)) {
-        //     isSomeThingWrong = true;
-        // }
-        // in the regexp true - correct email false - wrong email
-
-        // if (isSomeThingWrong) {
-        //     // then return immediately
-        //     res.status(400).send("Make sure you are inputting all the required information in the correct format");
-        //     return;
-        // }
-
-        // else 
-
-
-        // then do the user creation process    
+        // then do the user creation process  
+        
         let user = await signUpService.userSignUp({
+            name : sentInfo.name,
             id_number : sentInfo.id,
             email: sentInfo.email,
             password: sentInfo.password,
-            role : sentInfo.role
+            role : sentInfo.role,
+            department : sentInfo.department 
+            // this will be something for students and null for staff
         })
         // user will be true(created successfully) or false(already exists) 
 
 
-        // console.log(user)
+        console.log("user from signUpFunction " , user);
+
         if (user.success) {
             res.status(201).json({ userCreated: true });
         }
@@ -98,6 +80,8 @@ let verifyOtpFunction = async (req, res) => {
             res.status(200).json({
                 accessToken: result.data.accessToken,
                 refreshToken: result.data.refreshToken,
+                role : result.data.role, 
+                // we also need to send the role to make them be able to see the homepage
             })
         } else {
             res.status(400).json({ reason: result.reason })
@@ -135,6 +119,7 @@ let logInFunction = async (req, res) => {
         // in req.body = {email , password}
         let { email, password } = req.body;
 
+        console.log("Log In requested with " , req.body);
         let result = await LogInLogOutSignOutHandler.LogIn({ email, password });
 
         if (result.success) {

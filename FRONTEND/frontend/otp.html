@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OTP Verification</title>
+  <link rel="stylesheet" href="otp.css">
+</head>
+
+<body>
+
+  <div class="otp-container">
+    <h2>OTP Verification</h2>
+    <p>Enter the 6-digit code sent to you</p>
+
+    <input type="text" id="otpInput" maxlength="6" placeholder="Enter OTP" />
+
+    <button id="verifyBtn">Verify OTP</button>
+
+    <p class="timer">
+      OTP expires in <span id="timeLeft">02:00</span>
+    </p>
+
+    <p class="resend">
+      Didn’t get the code?
+      <button id="resendBtn" disabled>Resend OTP</button>
+      <!-- after 2 minutes u will need to activate the button after 2 minutes -->
+    </p>
+
+
+    <p class="error" id="errorMsg"></p>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>
