@@ -1,0 +1,44 @@
+The data base will be a graphql data base in assosiation with postgres
+postgres will be a single source of truth users , interests , \\
+
+Inside the graph i will store name , email , information i want
+When user logs in then i will check verified users and on the homepage query that 
+
+
+Login successful returns the userId - to quicken the query
+userId will be same across verified_users table and graph's  nodeId
+Homepage lay i will return matched users and all related information
+
+interest match siareg 
+
+
+Sign up siareg - he will select info - user-interest lay
+another user interest siasgeba the system will do
+system lk simezegeb it will query user_intersts table and then return id = matching algo 
+then return sidereg inside the graph node it will form relationships 
+then it will return name , profile  , interests - from the 
+
+The graph node and the pg table works in sync manner with the nodes
+
+what if no table 
+
+graph bcha
+nodes - name , email , profile , id , intersests
+edge based on interest []]
+
+
+what if one single node trash node that contains all the interests 
+all coming nodes will be connected with it
+then match snareg based on relationship from that node
+
+
+
+so better idea
+Create a user interest node
+Then upon registering u find the user node and then u cr8 relationship between the central interest node and new user
+then when u query then u find the user node then u do second jump to all interests 
+gn how do u introduce scoring like ranking
+
+
+interest single node
+Then connect the users with the interest 

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | AAU Lost ID Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/signUp.css">
+</head>
+
+<body>
+    <!-- Background Shapes -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="main">
+        <div class="container">
+            <!-- Header -->
+            <div class="logo-header">
+                <div class="logo-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div>
+                    <h2>Create Account</h2>
+                    <p class="subtitle">Sign up once. Login anytime.</p>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="statusMessage" class="status-message"></div>
+
+            <!-- SIGNUP FORM -->
+            <form id="signupForm">
+                <div class="role-badge">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Sign Up</span>
+                    <i class="fas fa-lock" style="margin-left: auto;"></i>
+                </div>
+
+                <!-- Main Role Selection -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user-tag"></i> Select Main Role
+                    </label>
+                    <select id="mainRoleSelect" name="role" required>
+                        <option value="" disabled selected>Select your main role</option>
+                        <option value="Student">Student</option>
+                        <option value="Staff">Staff</option>
+                    </select>
+                </div>
+                <!-- Department Selection - Only for Students -->
+                <div class="form-group dynamic-field" id="departmentGroup">
+                    <label class="form-label">
+                        <i class="fas fa-building"></i> Select Department
+                    </label>
+                    <select id="departmentSelect" name="department">
+                        <option value="" disabled selected>Select your department</option>
+                        <option value="CBME">CBME (Biomedical Engineering)</option>
+                        <option value="SCBE">SCBE (Chemical Engineering)</option>
+                        <option value="SCEE">SCEE (Civil Engineering)</option>
+                        <option value="SECE">SECE (Electrical Engineering)</option>
+                        <option value="SITE">SITE (Software Engineering)</option>
+                        <option value="SMIE">SMIE (Mechanical Engineering)</option>
+                    </select>
+                </div>
+
+                <!-- Staff Role Selection - Only for Staff -->
+                <div class="form-group dynamic-field" id="staffRoleGroup">
+                    <label class="form-label">
+                        <i class="fas fa-briefcase"></i> Select Staff Role
+                    </label>
+                    <select id="staffRoleSelect" name="role">
+                        <option value="" disabled selected>Select your staff role</option>
+                        <option value="Library">Library Staff</option>
+                        <option value="Registrar">Registrar Office</option>
+                        <option value="Book-Store">Book Store</option>
+                        <option value="Campus-Police">Campus Police</option>
+                        <option value="Finance">Finance Office</option>
+                        <option value="Department-Head">Department Head</option>
+                        <option value="Other-Staff">Other Staff</option>
+                    </select>
+                </div>
+
+                <!-- Department Head Department Selection - Only when Department Head is selected -->
+                <div class="form-group dynamic-field" id="deptHeadDepartmentGroup">
+                    <label class="form-label">
+                        <i class="fas fa-university"></i> Select Your Department (Department Head)
+                    </label>
+                    <select id="deptHeadDepartmentSelect" name="department">
+                        <option value="" disabled selected>Select department you head</option>
+                        <option value="CBME">CBME (Biomedical Engineering)</option>
+                        <option value="SCBE">SCBE (Chemical Engineering)</option>
+                        <option value="SCEE">SCEE (Civil Engineering)</option>
+                        <option value="SECE">SECE (Electrical Engineering)</option>
+                        <option value="SITE">SITE (Software Engineering)</option>
+                        <option value="SMIE">SMIE (Mechanical Engineering)</option>
+                    </select>
+                </div>
+
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fa-solid fa-user"></i> Full Name
+                    </label>
+                    <input type="text" name="name" id="name" placeholder="Enter your full name" required />
+                </div>
+
+                <!-- ID Field - Different placeholder based on role -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-id-badge"></i> ID Number
+                    </label>
+                    <input type="text" name="id" id="userId" placeholder="Enter your ID number" required />
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" name="email" id="email" placeholder="xyz@aau.edu.et" required />
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-key"></i> Password
+                    </label>
+                    <input type="password" name="password" id="password" placeholder="Minimum 6 characters" required
+                        minlength="6" />
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="sendOtpBtn">
+                    <i class="fas fa-paper-plane"></i> Send OTP
+                </button>
+            </form>
+            <!-- OTP FORM -->
+            <form id="otpForm" style="display:none;">
+                <div class="otp-header">
+                    <div class="otp-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Verify Your Email</h3>
+                </div>
+
+                <p class="otp-info">
+                    We've sent a 6-digit verification code to<br>
+                    <strong id="userEmail"></strong>
+                </p>
+
+                <!-- OTP Input Digits -->
+                <div class="otp-input-container">
+                    <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" data-index="0" autofocus>
+                    <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" data-index="1">
+                    <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" data-index="2">
+                    <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" data-index="3">
+                    <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" data-index="4">
+                    <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" data-index="5">
+                </div>
+
+                <!-- Hidden OTP Input for Form Submission -->
+                <input type="hidden" id="otpInput">
+
+                <!-- Timer -->
+                <div class="otp-timer">
+                    <span class="timer-text">Code expires in</span>
+                    <span class="timer" id="otpTimer">02:00</span>
+                </div>
+
+                <!-- OTP Action Buttons -->
+                <div class="otp-buttons">
+                    <button type="submit" id="verifyBtn">
+                        <i class="fas fa-check-circle"></i> Verify & Create Account
+                    </button>
+
+                    <button type="button" id="resendOtpBtn" disabled>
+                        <i class="fas fa-redo"></i> Resend OTP (60s)
+                    </button>
+
+                    <button type="button" id="resetOtpBtn">
+                        <i class="fas fa-undo"></i> Back to Sign Up
+                    </button>
+                </div>
+            </form>
+
+            <!-- Login Link -->
+            <div class="login-link">
+                Already registered?
+                <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login to your account</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM Elements
+            const mainRoleSelect = document.getElementById('mainRoleSelect');
+            const departmentGroup = document.getElementById('departmentGroup');
+            const departmentSelect = document.getElementById('departmentSelect');
+            const staffRoleGroup = document.getElementById('staffRoleGroup');
+            const staffRoleSelect = document.getElementById('staffRoleSelect');
+            const deptHeadDepartmentGroup = document.getElementById('deptHeadDepartmentGroup');
+            const deptHeadDepartmentSelect = document.getElementById('deptHeadDepartmentSelect');
+            const userIdInput = document.getElementById('userId');
+            const roleBadge = document.querySelector('.role-badge');
+            const roleBadgeIcon = roleBadge.querySelector('i');
+            const roleBadgeText = roleBadge.querySelector('span');
+            const signupForm = document.getElementById('signupForm');
+            const otpForm = document.getElementById('otpForm');
+            const statusMessage = document.getElementById('statusMessage');
+            const userEmail = document.getElementById('userEmail');
+            const otpTimer = document.getElementById('otpTimer');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const resendOtpBtn = document.getElementById('resendOtpBtn');
+            const resetOtpBtn = document.getElementById('resetOtpBtn');
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            const otpDigits = document.querySelectorAll('.otp-digit');
+            const hiddenOtpInput = document.getElementById('otpInput');
+
+            // State Variables
+            let otpCountdown;
+            let otpTimeLeft = 120;
+            let generatedOtp = '';
+            let userData = {};
+            // Main Role Change Handler
+            mainRoleSelect.addEventListener('change', function () {
+                const selectedRole = this.value;
+
+                // Reset all dynamic fields
+                departmentGroup.classList.remove('visible');
+                staffRoleGroup.classList.remove('visible');
+                deptHeadDepartmentGroup.classList.remove('visible');
+
+                // Reset required attributes
+                departmentSelect.required = false;
+                departmentSelect.value = '';
+                staffRoleSelect.required = false;
+                staffRoleSelect.value = '';
+                deptHeadDepartmentSelect.required = false;
+                deptHeadDepartmentSelect.value = '';
+
+                // Update role badge
+                if (selectedRole === 'Student') {
+                    roleBadgeIcon.className = 'fas fa-user-graduate';
+                    roleBadgeText.textContent = 'Student Registration';
+                    roleBadge.classList.remove('staff-role-badge');
+
+                    // Show department selection for students
+                    departmentGroup.classList.add('visible');
+                    departmentSelect.required = true;
+
+                    // Update ID placeholder for students
+                    userIdInput.placeholder = "e.g., UGR/1234/14";
+                } else if (selectedRole === 'Staff') {
+                    roleBadgeIcon.className = 'fas fa-briefcase';
+                    roleBadgeText.textContent = 'Staff Registration';
+                    roleBadge.classList.add('staff-role-badge');
+
+                    // Show staff role selection
+                    staffRoleGroup.classList.add('visible');
+                    staffRoleSelect.required = true;
+
+                    // Update ID placeholder for staff
+                    userIdInput.placeholder = "e.g., STAFF/5678";
+                }
+            });
+
+            // Staff Role Change Handler
+            staffRoleSelect.addEventListener('change', function () {
+                const selectedStaffRole = this.value;
+
+                // Hide department head department selection by default
+                deptHeadDepartmentGroup.classList.remove('visible');
+                deptHeadDepartmentSelect.required = false;
+                deptHeadDepartmentSelect.value = '';
+
+                // Show department selection only for Department Head
+                if (selectedStaffRole === 'Department-Head') {
+                    deptHeadDepartmentGroup.classList.add('visible');
+                    deptHeadDepartmentSelect.required = true;
+                }
+            });
+
+            // Show status message
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = `status-message ${type}`;
+                statusMessage.style.display = 'block';
+
+                if (type === 'success') {
+                    setTimeout(() => {
+                        statusMessage.style.display = 'none';
+                    }, 3000);
+                }
+            }
+
+
+            // Generate random 6-digit OTP
+            function generateOTP() {
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            }
+            // Start OTP countdown timer
+            function startOTPTimer() {
+                clearInterval(otpCountdown);
+
+                otpTimeLeft = 120;
+                resendOtpBtn.disabled = true;
+                resendOtpBtn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP (02:00)';
+                otpTimer.classList.remove('timer-expired');
+
+                otpCountdown = setInterval(() => {
+                    otpTimeLeft--;
+
+                    if (otpTimeLeft <= 0) {
+                        clearInterval(otpCountdown);
+                        otpTimer.textContent = '00:00';
+                        resendOtpBtn.disabled = false;
+                        resendOtpBtn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP';
+                        showStatus('OTP has expired. Please request a new one.', 'error');
+                        return;
+                    }
+
+                    const minutes = Math.floor(otpTimeLeft / 60);
+                    const seconds = otpTimeLeft % 60;
+
+                    otpTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds
+                        .toString()
+                        .padStart(2, '0')}`;
+
+                    // Update resend button when under 60 seconds
+                    if (otpTimeLeft <= 60) {
+                        resendOtpBtn.innerHTML = `<i class="fas fa-redo"></i> Resend OTP (${seconds}s)`;
+                    }
+
+                    // Turn red under 30 seconds
+                    if (otpTimeLeft < 30) {
+                        otpTimer.classList.add('timer-expired');
+                    }
+                }, 1000);
+            }
+
+
+            // Handle OTP digit input
+            function handleOtpInput(e) {
+                const input = e.target;
+                const value = input.value;
+
+                // Only allow numbers
+                if (!/^\d*$/.test(value)) {
+                    input.value = '';
+                    return;
+                }
+
+                // If a digit is entered, move to next input
+                if (value.length === 1) {
+                    const index = parseInt(input.dataset.index);
+                    if (index < 5) {
+                        otpDigits[index + 1].focus();
+                    }
+                }
+
+                // Update hidden OTP input
+                updateHiddenOtp();
+            }
+
+            // Update hidden OTP input value
+            function updateHiddenOtp() {
+                let otp = '';
+                otpDigits.forEach(digit => {
+                    otp += digit.value;
+                });
+                hiddenOtpInput.value = otp;
+            }
+
+            // Handle OTP digit deletion
+            function handleOtpKeyDown(e) {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    const input = e.target;
+                    const index = parseInt(input.dataset.index);
+
+                    if (input.value === '' && index > 0) {
+                        otpDigits[index - 1].focus();
+                    }
+                }
+            }
+
+            // Reset OTP form
+            function resetOtpForm() {
+                otpDigits.forEach(digit => {
+                    digit.value = '';
+                });
+                updateHiddenOtp();
+                otpTimer.classList.remove('timer-expired');
+                otpTimer.textContent = '02:00';
+                clearInterval(otpCountdown);
+            }
+            
+            // Validate OTP
+            function validateOTP() {
+                const otp = hiddenOtpInput.value;
+
+                if (otp.length !== 6) {
+                    showStatus('Please enter the complete 6-digit OTP', 'error');
+                    return false;
+                }
+
+                if (otp !== generatedOtp) {
+                    showStatus('Invalid OTP. Please try again.', 'error');
+                    return false;
+                }
+
+                return true;
+            }
+           
+
+            
+            // Resend OTP Button
+            resendOtpBtn.addEventListener('click', function () {
+                if (this.disabled) return;
+
+                // Generate new OTP
+                generatedOtp = generateOTP();
+
+                // Show loading state
+                resendOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resending...';
+                resendOtpBtn.disabled = true;
+
+                // Simulate resend delay
+                setTimeout(() => {
+                    showStatus('New OTP sent to your email', 'success');
+
+                    // Reset OTP form
+                    resetOtpForm();
+                    otpDigits[0].focus();
+
+                    // Start new timer
+                    startOTPTimer();
+
+                    // Log new OTP to console for demo
+                    console.log('New OTP (for demo only):', generatedOtp);
+                }, 1000);
+            });
+
+            // Reset OTP Button (go back to signup)
+            resetOtpBtn.addEventListener('click', function () {
+                signupForm.style.display = 'block';
+                otpForm.style.display = 'none';
+                resetOtpForm();
+                clearInterval(otpCountdown);
+                showStatus('', '');
+            });
+            // Add event listeners to OTP digits
+            otpDigits.forEach(digit => {
+                digit.addEventListener('input', handleOtpInput);
+                digit.addEventListener('keydown', handleOtpKeyDown);
+            });
+
+            // Auto-submit OTP when all digits are filled
+            otpDigits[5].addEventListener('input', function () {
+                if (hiddenOtpInput.value.length === 6) {
+                    setTimeout(() => {
+                        otpForm.dispatchEvent(new Event('submit'));
+                    }, 100);
+                }
+            });
+        });
+    </script>
+
+    <script src = "app.js" type="module"></script>
+</body>
+
+</html>

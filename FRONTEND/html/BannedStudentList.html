@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banned Students</title>
+  <link rel = "stylesheet" href="../css/bannedStudentListstyle.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Banned Students</h1>
+      <div class="search-box">
+        <input type="text" placeholder="Search by name or ID" />
+      </div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Student ID</th>
+            <th>Reason</th>
+            <th>Banned On</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Student">Omer Hassan</td>
+            <td data-label="Student ID">STU-44512</td>
+            <td data-label="Reason">Repeated misuse</td>
+            <td data-label="Banned On">2026-01-04</td>
+            <td data-label="Status"><span class="status">Banned</span></td>
+            <td data-label="Action">
+              <div class="actions">
+                <button class="unban-btn" onclick="handleUnban('BAN-001')">Unban</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  function handleUnban(banId) {
+    const confirmUnban = confirm('Are you sure you want to unban this student?');
+    if (!confirmUnban) return;
+
+    // Example backend call
+    // fetch(`/staff/banned-students/${banId}/unban`, { method: 'PATCH' })
+
+    alert('Student has been unbanned (mock action).');
+    // In real app: remove row from table after success
+  }
+</script>
+</body>
+</html>

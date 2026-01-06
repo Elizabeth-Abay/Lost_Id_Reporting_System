@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Lost ID</title>
+  <link rel = "stylesheet" href="../css/reportLost.css">
+</head>
+<body>
+
+  <div class="card">
+    <h1>Report Lost ID</h1>
+    <p>Please provide accurate details to help us recover or replace your ID.</p>
+
+    <form>
+      <div class="form-group">
+        <label for="studentId">Student ID</label>
+        <input type="text" id="studentId" placeholder="e.g. STU-20491" required />
+      </div>
+
+
+      <div class="form-group">
+        <label for="dateLost">Date Lost</label>
+        <input type="date" id="dateLost" required />
+      </div>
+
+      
+      
+
+      <div class="actions">
+        <button type="submit">Submit Lost ID Report</button>
+      </div>
+    </form>
+
+    <div class="warning">
+      Submitting false reports may result in disciplinary action.
+    </div>
+  </div>
+
+</body>
+</html>

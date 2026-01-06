@@ -1,0 +1,153 @@
+:root {
+    --primary: #1e3a8a;
+    --secondary: #3b82f6;
+    --dark: #0f172a;
+    --white: #ffffff;
+    --off-white: #f8fafc;
+    --gray: #94a3b8;
+    --danger: #dc2626;
+    --success: #16a34a;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: var(--off-white);
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: var(--dark);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.search-box input {
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(30, 58, 138, 0.2);
+    width: 260px;
+    outline: none;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(30, 58, 138, 0.12);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+th,
+td {
+    padding: 16px;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+th {
+    font-weight: 700;
+}
+
+tbody tr {
+    border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: var(--off-white);
+}
+
+.status {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    background: #fee2e2;
+    color: var(--danger);
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.unban-btn {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.unban-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(30, 58, 138, 0.35);
+}
+
+@media (max-width: 768px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody tr {
+        background: var(--white);
+        margin-bottom: 16px;
+        padding: 16px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 700;
+    }
+}

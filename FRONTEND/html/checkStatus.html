@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check ID Status</title>
+  <link rel="stylesheet" href="../css/checkStatus.css">
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>My ID Requests Status</h1>
+      <p>Track the progress of your student ID requests</p>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Department</th>
+            <th>Date Submitted</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Request ID">REQ-00123</td>
+            <td data-label="Department">Registrar</td>
+            <td data-label="Date Submitted">2026-01-05</td>
+            <td data-label="Status"><span class="status approved">Approved</span></td>
+          </tr>
+          <tr>
+            <td data-label="Request ID">REQ-00124</td>
+            <td data-label="Department">Finance</td>
+            <td data-label="Date Submitted">2026-01-05</td>
+            <td data-label="Status"><span class="status pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Request ID">REQ-00125</td>
+            <td data-label="Department">Library</td>
+            <td data-label="Date Submitted">2026-01-06</td>
+            <td data-label="Status"><span class="status rejected">Rejected</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

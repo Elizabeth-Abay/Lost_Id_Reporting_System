@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff • ID Request Review</title>
+  <link rel = "stylesheet" href="../css/rejectAndAccept.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>ID Replacement Requests</h1>
+        <span>Review and take action</span>
+      </div>
+      <span>Staff Panel</span>
+    </header>
+
+    <section class="grid">
+      <!-- Example Card -->
+      <div class="card" data-request-id="REQ-101">
+        <div class="row">
+          <strong>Elizabeth Z.</strong>
+          <span class="tag">Pending</span>
+        </div>
+        <div class="info">
+          <p><span>Student ID:</span> STU-22014</p>
+          <p><span>Department:</span> Computer Science</p>
+          <p><span>Reason:</span> Lost ID</p>
+        </div>
+        <div class="actions">
+          <button class="approve">Approve</button>
+          <button class="reject">Reject</button>
+        </div>
+      </div>
+
+      <div class="card" data-request-id="REQ-102">
+        <div class="row">
+          <strong>Yohannes K.</strong>
+          <span class="tag">Pending</span>
+        </div>
+        <div class="info">
+          <p><span>Student ID:</span> STU-19831</p>
+          <p><span>Department:</span> Electrical Eng.</p>
+          <p><span>Reason:</span> Damaged ID</p>
+        </div>
+        <div class="actions">
+          <button class="approve">Approve</button>
+          <button class="reject">Reject</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Reject Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <h2>Reject Request</h2>
+      <p style="margin:0;color:var(--muted);font-size:0.9rem;">
+        Please provide a clear reason. This will be visible to the student.
+      </p>
+      <textarea id="rejectReason" placeholder="Enter rejection reason..."></textarea>
+      <div class="modal-actions">
+        <button class="cancel">Cancel</button>
+        <button class="submit-reject" id="submitReject" disabled>Submit Rejection</button>
+      </div>
+    </div>
+  </div>
+
+  <script src = "../js/acceptAndReject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Banned Students</title>
+  <link rel ="stylesheet" href="../css/unban.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h1>My Banned Students</h1>
+        <p>Students banned by you</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Ban Reason</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Student ID">STU-20491</td>
+            <td data-label="Duration">30 Days</td>
+            <td data-label="Status"><span class="status banned">Banned</span></td>
+            <td data-label="Action"><button class="action-btn unban">Unban</button></td>
+          </tr>
+
+          <tr>
+            <td data-label="Student ID">STU-19320</td>
+            <td data-label="Duration">Permanent</td>
+            <td data-label="Status"><span class="status banned">Banned</span></td>
+            <td data-label="Action"><button class="action-btn unban">Unban</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty state example -->
+      <!-- <div class="no-data">You have not banned any students.</div> -->
+    </div>
+  </div>
+
+</body>
+</html>
