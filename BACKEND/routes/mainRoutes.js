@@ -24,6 +24,8 @@ router.post('/found-id', publicController.reportFoundId);
 // Student routes (authentication + student role required)
 router.post('/student/lost-id', CheckHealthOfAccessToken , studentController.reportLostId);
 router.post('/student/new-id', CheckHealthOfAccessToken , studentController.requestNewId);
+
+// not yet there - how to pass the dynamic parameter properly
 router.get('/student/status/:idNumber', CheckHealthOfAccessToken , studentController.checkRequestStatus);
 router.get('/student/notifications', CheckHealthOfAccessToken , studentController.getNotifications);
 

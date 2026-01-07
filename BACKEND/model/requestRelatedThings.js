@@ -166,10 +166,10 @@ async function getUnsignedByMe(sentInfo) {
         let colName = role + '_sign'
 
         let result = await pool.query(
-            `SELECT police_document , id FROM requestFlow WHERE ${colName} IS NULL AND status = 'pending'`
+            `SELECT policeDocument , id FROM requestFlow WHERE ${colName} IS NULL AND status = 'pending'`
         )
 
-        // we will get police_document which is the image
+        // we will get policeDocument which is the image
         // and the id of the request which will be made the div's id when sent to the frontend
 
         if (!result){

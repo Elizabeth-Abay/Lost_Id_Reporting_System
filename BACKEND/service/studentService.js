@@ -86,7 +86,7 @@ class StudentService {
 
             // Create new request flow entry
             const result = await pool.query(
-                `INSERT INTO requestFlow (id_number, requester_id, police_document, status)
+                `INSERT INTO requestFlow (id_number, requester_id, policeDocument, status)
                  VALUES ($1, $2, $3, 'pending')
                  RETURNING *`,
                 [idNumber, userId, policeDocument]
@@ -120,19 +120,17 @@ class StudentService {
 
             // Get all requests for this student
             const requests = await pool.query(
-                `SELECT rf.*, 
-                        CASE 
-                            WHEN rf.rejection_id IS NOT NULL THEN rr.reason
-                            ELSE NULL
-                        END as rejection_reason
+                `SELECT rf.* , rr.reason
                  FROM requestFlow rf
-                 LEFT JOIN rejected_requests rr ON rf.rejection_id = rr.id
+                 LEFT JOIN rejected_requests rr ON rr.rejected_request_id = rf.id
                  WHERE rf.requester_id = $1 
                  ORDER BY rf.created_at DESC`,
                 [userId]
             );
 
-            if (!requests.success) {
+            // console.log(requests);
+
+            if (!requests) {
                 return {
                     success: false,
                     reason: "Failed to retrieve request status"
@@ -178,7 +176,7 @@ class StudentService {
             const recentRejections = await pool.query(
                 `SELECT rf.id, rf.status, rr.reason, rr.created_at
                  FROM requestFlow rf
-                 JOIN rejected_requests rr ON rf.rejection_id = rr.id
+                 JOIN rejected_requests rr ON rr.rejected_request_id = rf.id
                  WHERE rf.requester_id = $1 AND rf.status = 'rejected'
                  ORDER BY rr.created_at DESC
                  LIMIT 5`,
