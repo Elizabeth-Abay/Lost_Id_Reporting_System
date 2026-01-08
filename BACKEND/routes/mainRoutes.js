@@ -3,7 +3,8 @@ const { StudentController, StaffController, PublicController } = require('../con
 // const { authenticateToken } = require('../middleware/authMiddleware');
 const { LogInAndSignUpRouter } = require('./userlogin');
 const { isStaff , declineNonStaffUsers } = require('../middleware/ForAuthorizingStaffs');
-const  {  CheckHealthOfRefreshToken, CheckHealthOfAccessToken } = require('../middleware/ForGeneratingAccessTokenFromRefToken')
+const  {  CheckHealthOfRefreshToken, CheckHealthOfAccessToken } = require('../middleware/ForGeneratingAccessTokenFromRefToken');
+const { upload }  = require('../controller/multerConnector');
 
 const router = express.Router();
 
@@ -23,10 +24,10 @@ router.post('/found-id', publicController.reportFoundId);
 
 // Student routes (authentication + student role required)
 router.post('/student/lost-id', CheckHealthOfAccessToken , studentController.reportLostId);
-router.post('/student/new-id', CheckHealthOfAccessToken , studentController.requestNewId);
+router.post('/student/new-id', CheckHealthOfAccessToken , upload.single('policeDocument') ,studentController.requestNewId);
 
 // not yet there - how to pass the dynamic parameter properly
-router.get('/student/status/:idNumber', CheckHealthOfAccessToken , studentController.checkRequestStatus);
+// router.get('/student/status/:idNumber', CheckHealthOfAccessToken , studentController.checkRequestStatus);
 router.get('/student/notifications', CheckHealthOfAccessToken , studentController.getNotifications);
 
 // Staff routes (authentication + staff role required)

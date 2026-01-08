@@ -42,33 +42,32 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS configuration
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         // Allow requests with no origin (like mobile apps or curl requests)
+//         if (!origin) return callback(null, true);
         
-        // In development, allow all origins
-        if (process.env.NODE_ENV === 'development') {
-            return callback(null, true);
-        }
+//         // In development, allow all origins
+//         if (process.env.NODE_ENV === 'development') {
+//             return callback(null, true);
+//         }
         
-        // In production, specify allowed origins
-        const allowedOrigins = [
-            'http://localhost:8080',
-            'http://127.0.0.1:8080',
-            'https://yourdomain.com' // Add your production domain
-        ];
+//         // In production, specify allowed origins
+//         const allowedOrigins = '*'
         
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+//         if (allowedOrigins.indexOf(origin) !== -1) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     credentials: true,
+//     optionsSuccessStatus: 200
+// };
+app.use(cors({
+    origin : '*',
+    credentials : true
+}));
 
 // Compression middleware
 app.use(compression());

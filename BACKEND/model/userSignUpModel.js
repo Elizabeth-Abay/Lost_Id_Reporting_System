@@ -3,6 +3,30 @@ const { pool } = require('./connect.js')
 // so now u write the sql query using pool.query()
 // note when u create a user u dont want to have the same email from verified
 
+async function deleteUserFromPendingStateIfExistedBefore(email) {
+    try{
+        let result = await pool.query('DELETE FROM pendingUsers WHERE email = $1' , [email]);
+
+        if (!result){
+            return {
+                success : false,
+                reason : "Data base error"
+            }
+        }
+        return {
+            success : true
+        }
+
+    } catch (err){
+        console.log("Error while deleteUserFromPendingStateIfExistedBefore " , err);
+        return {
+            success : false,
+            reason : "Error while checking the data base issue"
+        }
+    }
+    
+}
+
 async function checkEmailIsVerifiedBefore(email) {
     try {
         let result = await pool.query('SELECT * FROM Users WHERE email = $1', [email])
@@ -156,7 +180,7 @@ async function checkTheOTPmatches(sentInfo) {
 async function deleteUserFromPendingState(sentInfo) {
     try {
         let { id } = sentInfo;
-        let result = await pool.query('DELETE FROM pendingUsers WHERE id = $1', [id]);
+        let result = await pool.query('SELECT * FROM  move_User_Into_Verified($1)', [id]);
 
         // console.log("Result from the deleteUserFromPendingState", result)
 
@@ -242,4 +266,4 @@ async function updateOTP(sentInfo) {
 }
 
 
-module.exports = { checkEmailIsVerifiedBefore, createPendingUser, checkTheOTPmatches, deleteUserFromPendingState, puttingInfoIntoRefTokenInfo , updateOTP }
+module.exports = { checkEmailIsVerifiedBefore, createPendingUser, checkTheOTPmatches, deleteUserFromPendingState, puttingInfoIntoRefTokenInfo , updateOTP , deleteUserFromPendingStateIfExistedBefore }

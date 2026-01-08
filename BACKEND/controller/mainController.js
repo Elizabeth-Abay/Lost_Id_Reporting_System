@@ -3,6 +3,9 @@ const { staffPrivillageObj } = require('../service/staffPrivilleges');
 const { notificationService } = require('../service/notificationService');
 const { ReportingLostAndFound } = require('../service/reportingLostAndFound');
 
+const { storage } = require('./multerConnector');
+
+
 const studentService = new StudentService();
 
 const reportLostAndFoundService = new ReportingLostAndFound();
@@ -25,7 +28,7 @@ class StudentController {
             const result = await studentService.reportLostId({ userId, idNumber });
 
             if (result.success) {
-                return res.status(200).json({"message" : "Id report successful"});
+                return res.status(200).json({ "message": "Id report successful" });
             } else {
                 return res.status(400).json(result);
             }
@@ -42,7 +45,11 @@ class StudentController {
     async requestNewId(req, res) {
         try {
             const { userId } = req.decodedAccess; // From JWT middleware
-            const { idNumber, policeDocument } = req.body;
+            // as a middleware u will have the req.path
+            const policeDocument = req.file ? `/uploads/${req.file.filename}` : null;
+            // policeDocument is gonna be the path of the document
+            const { idNumber } = req.body;
+
 
             if (!idNumber || !policeDocument) {
                 return res.status(400).json({
@@ -201,7 +208,7 @@ class StaffController {
     async rejectRequest(req, res) {
         try {
             const { userId: rejected_by } = req.decodedAccess; // From JWT middleware
-            const { reason,  rejectedRequestId } = req.body;
+            const { reason, rejectedRequestId } = req.body;
 
             let rejected_request_Id = rejectedRequestId;
 
@@ -305,7 +312,7 @@ class StaffController {
             const result = await staffPrivillageObj.getUnSignedRequests({ role });
 
             if (result.success) {
-                return res.status(200).json({"result" : result.data});
+                return res.status(200).json({ "result": result.data });
             } else {
                 return res.status(400).json(result);
             }

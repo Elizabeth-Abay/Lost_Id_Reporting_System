@@ -172,7 +172,7 @@ class StudentService {
             // Get recent notifications based on database events
             // This would typically query a notifications table
             // For now, we'll return recent status changes
-            
+
             const recentRejections = await pool.query(
                 `SELECT rf.id, rf.status, rr.reason, rr.created_at
                  FROM requestFlow rf
@@ -197,10 +197,33 @@ class StudentService {
                  FROM lostIdReport lr
                  JOIN foundIdReport fr ON lr.founded_by = fr.id
                  WHERE lr.user_id = $1 AND lr.found_status = true
-                 ORDER BY lr.created_at DESC
+                 AND seen = FALSE
                  LIMIT 5`,
                 [userId]
             );
+
+            // once we query the table then mark the state of the found id to be seen
+            // so create array of the ids
+
+            let resultRows = [];
+            // console.log(foundIds.rows)
+
+            // then loop through obj
+            for (let rs of foundIds.rows) {
+                // push the id of rs into the array
+                resultRows.push(rs.id);
+            };
+
+            console.log(resultRows)
+
+
+            let res = await pool.query(`
+                UPDATE lostIdReport 
+                SET seen = TRUE 
+                WHERE id = ANY($1)
+                ` , [resultRows]);
+
+
 
             return {
                 success: true,
@@ -213,7 +236,7 @@ class StudentService {
             };
 
         } catch (error) {
-            console.error("Error in StudentService.getStudentNotifications:", error.message);
+            console.error("Error in  StudentService.getStudentNotifications:", error.message);
             return {
                 success: false,
                 reason: "Internal server error while retrieving notifications"
