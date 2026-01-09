@@ -166,8 +166,11 @@ async function getUnsignedByMe(sentInfo) {
         let colName = role + '_sign'
 
         let result = await pool.query(
-            `SELECT policeDocument , id FROM requestFlow WHERE ${colName} IS NULL AND status = 'pending'`
+            `SELECT policeDocument , id , id_number FROM requestFlow WHERE ${colName} IS NULL AND status = 'pending'`
         )
+
+
+        // console.log("Result from database query ",result.rows )
 
         // we will get policeDocument which is the image
         // and the id of the request which will be made the div's id when sent to the frontend
@@ -183,6 +186,7 @@ async function getUnsignedByMe(sentInfo) {
         return {
             success : true,
             data : result.rows
+            // result.rows is an array of { policedocument , id}
         }
 
     } catch (err) {

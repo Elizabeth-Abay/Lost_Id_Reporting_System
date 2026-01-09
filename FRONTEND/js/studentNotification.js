@@ -35,6 +35,15 @@ async function loadNotifications() {
     }
 }
 
+
+function createReportNotificationItem(founderName , ContactInfo , type = 'default') {
+    const div = document.createElement('div');
+    div.className = `notification-item ${type}`;
+    div.innerHTML = `<p>found By : ${founderName} </p>
+    <p>contact Info : ${ContactInfo}</p>` ;
+    return div;
+}
+
 function createNotificationItem(text, type = 'default') {
     const div = document.createElement('div');
     div.className = `notification-item ${type}`;
@@ -43,6 +52,9 @@ function createNotificationItem(text, type = 'default') {
 }
 
 function displayNotifications({ rejections, approvals, foundIds }) {
+    console.log(rejections);
+    console.log(approvals);
+    console.log(foundIds);
     rejectionsList.innerHTML = '';
     approvalsList.innerHTML = '';
     foundIdsList.innerHTML = '';
@@ -75,8 +87,7 @@ function displayNotifications({ rejections, approvals, foundIds }) {
     } else {
         foundIds.forEach(item => {
             foundIdsList.appendChild(
-                createNotificationItem(`ID: ${item.id} | Finder: ${item.founder_name} | Contact: ${item.contact_info} | Reported: ${new Date(item.created_at).toLocaleString()}`, 'found')
-            );
+            createReportNotificationItem(item.founder_name , item.contact_info )            );
         });
     }
 }

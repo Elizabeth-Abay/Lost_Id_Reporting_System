@@ -50,6 +50,8 @@ class StudentController {
             // policeDocument is gonna be the path of the document
             const { idNumber } = req.body;
 
+            console.log("New Id requested by ", idNumber)
+
 
             if (!idNumber || !policeDocument) {
                 return res.status(400).json({
@@ -59,6 +61,8 @@ class StudentController {
             }
 
             const result = await studentService.requestNewId({ userId, idNumber, policeDocument });
+
+            console.log("000result", result);
 
             if (result.success) {
                 return res.status(201).json(result);
@@ -123,6 +127,7 @@ class StaffController {
     async banStudent(req, res) {
         try {
             const { userId: bannedBy } = req.decodedAccess; // From JWT middleware
+            // console.log(bannedBy)
             const { idNumber, reason } = req.body;
 
             if (!idNumber || !reason) {
@@ -308,6 +313,7 @@ class StaffController {
     async getUnsignedRequests(req, res) {
         try {
             const { role } = req.decodedAccess; // From JWT middleware
+            console.log(role)
 
             const result = await staffPrivillageObj.getUnSignedRequests({ role });
 

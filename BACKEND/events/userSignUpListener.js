@@ -107,7 +107,7 @@ async function welcomingUsersUponSignUp(emailInfo) {
 
 
   } catch (err) {
-    console.log("Error while welcomingUsersUponSignUp ", err)
+    console.log("Error while welcomingUsersUponSignUp ", err.message);
   }
 }
 

@@ -14,13 +14,16 @@ async function fetchPendingRequests() {
                 "Authorization": `Bearer ${access}`
             }
         });
-        const result = await response.json();
+        const res = await response.json();
+
+        // console.log(result)
+        let arrayReturned = res.result;
 
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = ''; // Clear loading state
 
-        if (result.success && result.data.length > 0) {
-            result.data.forEach(req => {
+        if (response.ok && arrayReturned.length > 0) {
+            arrayReturned.forEach(req => {
                 const card = createRequestCard(req);
                 grid.appendChild(card);
             });
@@ -38,8 +41,8 @@ function createRequestCard(req) {
     div.id = `${req.id}`; // Setting ID from backend
 
     div.innerHTML = `
-        <h3 class="form-subtitle">Request ID: #${req.id}</h3>
         <img src="${req.policeDocument}" alt="Police Document" class="doc-preview">
+        <h3>Id number : ${req.id_number}</h3>
         <div class="actions">
             <button class="btn btn-accept" onclick="handleAccept(${req.id})">Accept</button>
             <button class="btn btn-cancel" onclick="openRejectModal(${req.id})">Reject</button>
@@ -65,7 +68,7 @@ async function handleAccept(id) {
             }
         )
 
-        if (result.success){
+        if (result.success) {
             return true;
         } else {
             return false;
@@ -79,19 +82,23 @@ async function whenAcceptIsClicked(e) {
     try {
         e.preventDefault();
         // get the id
-        let id = e.currentTarget.id;
+        let id = e.currentTarget;
+        // then get the parent's id and then 
 
         let acceptCase = await handleAccept(id);
 
-        if (acceptCase){
+        if (acceptCase) {
             // in a nice way notify the user
         }
+        else {
+            // notify the user
+        }
 
-    } catch (Err){
+    } catch (Err) {
         alert("Error while accepting the request")
     }
 
-    
+
 }
 
 function openRejectModal(id) {

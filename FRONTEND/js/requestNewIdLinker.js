@@ -1,11 +1,14 @@
-const form = document.getElementById('newIdForm');
+const formNewId = document.getElementById('newIdForm');
 const statusMessage = document.getElementById('statusMessage');
 const submitBtn = document.getElementById("form-submitter");
+
+console.log(formNewId);
 
 // Replace this with however you store JWT tokens
 const token = localStorage.getItem('accessToken');
 
-submitBtn.addEventListener('click', async (e) => {
+formNewId.addEventListener('submit', async (e) => {
+  console.log("Form submitted");
   e.preventDefault();
   e.stopPropagation();
 
@@ -32,6 +35,7 @@ submitBtn.addEventListener('click', async (e) => {
     });
 
     const data = await response.json();
+    console.log(data);
 
     if (response.ok) {
       // Show success message
@@ -39,13 +43,13 @@ submitBtn.addEventListener('click', async (e) => {
       statusMessage.style.color = 'green';
     } else {
       // Show backend error message
-      statusMessage.inne = `❌ ${data.message || 'Submission failed.'}`;
+      statusMessage.innerText  = `❌ ${data.message || 'Submission failed.'}`;
       statusMessage.style.color = 'red';
     }
 
   } catch (error) {
     console.error('Error submitting request:', error);
-    statusMessage.inne = '❌ Server error. Please try again later.';
+    statusMessage.innerText  = '❌ Server error. Please try again later.';
     statusMessage.style.color = 'red';
   }
 });

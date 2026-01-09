@@ -226,9 +226,11 @@ class staffPrivilleges {
             // we query the requestFlow
             // we need the column name only 
             let { role } = sentInfo;
+            console.log(role)
             // we get the role from the access Token
 
             let result = await getUnsignedByMe({role});
+            // console.log(result)
 
             if (result.success){
                 return {

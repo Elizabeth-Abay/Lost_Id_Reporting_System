@@ -5,18 +5,20 @@ let reportLostBtn = document.getElementById("btn-report-lost");
 let requestNewBtn = document.getElementById("btn-request-new");
 
 
-notificationBtn.addEventListener('click' , 
+notificationBtn.addEventListener('click', () => {
     window.location.href = "studentNotification.html"
+
+}
 )
 
 
 
-reportLostBtn.addEventListener('click' ,  () => {
+reportLostBtn.addEventListener('click', () => {
     window.location.href = "reportLostId.html"
 });
 
 
-requestNewBtn.addEventListener('click' , () => {
+requestNewBtn.addEventListener('click', () => {
     window.location.href = "requestForNewId.html"
 })
 

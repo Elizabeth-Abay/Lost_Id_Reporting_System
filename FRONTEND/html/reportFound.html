@@ -6,6 +6,7 @@
     <title>Report Lost ID</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel = "stylesheet" href="../css/reportFound.css">
+    <script src = "../js/reportFoundLinker.js" type="module"></script>
 </head>
 <body>
     <div class="main">
@@ -19,50 +20,33 @@
                     <i class="fas fa-id-card"></i>
                     <h3>Report Found ID Card</h3>
                 </div>
-                <form id="reportForm">
+                <form id="reportFoundForm">
                     <div class="form-group">
                         <label for="idNumber"><i class="fas fa-hashtag"></i> ID Number</label>
-                        <input type="text" id="idNumber" placeholder="UGR/6702/16">
+                        <input  name="foundIdNumber"  type="text" id="idNumber" placeholder="UGR/6702/16">
                         <small style="color: #6c757d; margin-top: 5px; font-size: 0.85rem;">If readable on the ID card</small>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="idType"><i class="fas fa-id-badge"></i> ID Type</label>
-                        <select id="idType">
-                            <option value="" disabled selected>Select ID type</option>
-                            <option value="student">Student ID</option>
-                            <option value="employee">Employee ID</option>
-                            <option value="faculty">Faculty ID</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
+                    
                     
                     <div class="form-group full-width">
                         <label for="foundAt"><i class="fas fa-map-marker-alt"></i> Found At</label>
-                        <input type="text" id="foundAt" placeholder="e.g., Main Library, Science Building, Cafeteria" required>
+                        <input name = "foundAt" type="text" id="foundAt" placeholder="e.g., Main Library, Science Building, Cafeteria" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="finderName"><i class="fas fa-user"></i> Your Name</label>
-                        <input type="text" id="finderName" placeholder="Markus Zeleke" required>
+                        <input name = "founderName" type="text" id="finderName" placeholder="Markus Zeleke" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="contact"><i class="fas fa-phone-alt"></i> Contact Info</label>
-                        <input type="text" id="contact" placeholder="Email or phone number" required>
+                        <input name = "contactInfo" type="text" id="contact" placeholder="Email or phone number" required>
                     </div>
                     
-                    <div class="form-group full-width">
-                        <label for="additionalInfo"><i class="fas fa-sticky-note"></i> Additional Information</label>
-                        <textarea id="additionalInfo" placeholder="Any additional details about where and when you found the ID card..."></textarea>
-                    </div>
                     
-                    <div class="id-image-preview" id="imageUpload">
-                        <i class="fas fa-camera"></i>
-                        <p>Upload a picture of the found ID card <span>(Optional)</span></p>
-                        <p style="font-size: 0.9rem; margin-top: 5px;">Click to browse or drag and drop</p>
-                        <input type="file" id="idImage" accept="image/*" style="display: none;">
-                    </div>
+                    
+            
                     
                     <div class="form-note">
                         <p><i class="fas fa-info-circle"></i> Your information will only be used to contact you regarding this found ID card. We'll notify the owner once we've identified them.</p>
@@ -85,124 +69,6 @@
             <button id="closeMessage">Return to Form</button>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('reportForm');
-            const resetBtn = document.getElementById('reset');
-            const imageUpload = document.getElementById('imageUpload');
-            const idImageInput = document.getElementById('idImage');
-            const successMessage = document.getElementById('successMessage');
-            const closeMessageBtn = document.getElementById('closeMessage');
-            
-            // Handle image upload
-            imageUpload.addEventListener('click', function() {
-                idImageInput.click();
-            });
-            
-            idImageInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imageUpload.innerHTML = `
-                            <i class="fas fa-check-circle" style="color: #2ecc71;"></i>
-                            <p>Image uploaded successfully!</p>
-                            <p style="font-size: 0.9rem; margin-top: 5px;">${idImageInput.files[0].name}</p>
-                            <button style="margin-top: 15px; padding: 8px 16px; font-size: 0.9rem; background: #f8f9fa; color: #6c757d;" id="changeImage">Change Image</button>
-                        `;
-                        
-                        // Add event listener to the new change image button
-                        document.getElementById('changeImage').addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            idImageInput.click();
-                        });
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-            
-            // Handle drag and drop for image
-            imageUpload.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#4a6491';
-                this.style.backgroundColor = '#f0f7ff';
-            });
-            
-            imageUpload.addEventListener('dragleave', function() {
-                this.style.borderColor = '#e1e5eb';
-                this.style.backgroundColor = '#f8f9fa';
-            });
-            
-            imageUpload.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#e1e5eb';
-                this.style.backgroundColor = '#f8f9fa';
-                
-                if (e.dataTransfer.files.length) {
-                    idImageInput.files = e.dataTransfer.files;
-                    const changeEvent = new Event('change');
-                    idImageInput.dispatchEvent(changeEvent);
-                }
-            });
-            
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Simple validation
-                const foundAt = document.getElementById('foundAt').value;
-                const finderName = document.getElementById('finderName').value;
-                const contact = document.getElementById('contact').value;
-                
-                if (!foundAt || !finderName || !contact) {
-                    alert('Please fill in all required fields.');
-                    return;
-                }
-                
-                // Show success message
-                successMessage.style.display = 'flex';
-                
-                // In a real application, you would send the form data to a server here
-                console.log('Form submitted with data:');
-                console.log('ID Number:', document.getElementById('idNumber').value);
-                console.log('ID Type:', document.getElementById('idType').value);
-                console.log('Found At:', foundAt);
-                console.log('Finder Name:', finderName);
-                console.log('Contact Info:', contact);
-                console.log('Additional Info:', document.getElementById('additionalInfo').value);
-                console.log('Image uploaded:', idImageInput.files.length > 0 ? 'Yes' : 'No');
-            });
-            
-            // Reset form
-            resetBtn.addEventListener('click', function() {
-                // Reset the image preview
-                imageUpload.innerHTML = `
-                    <i class="fas fa-camera"></i>
-                    <p>Upload a picture of the found ID card <span>(Optional)</span></p>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">Click to browse or drag and drop</p>
-                `;
-                idImageInput.value = '';
-                
-                // Add the click event back to the image upload area
-                imageUpload.addEventListener('click', function() {
-                    idImageInput.click();
-                });
-            });
-            
-            // Close success message
-            closeMessageBtn.addEventListener('click', function() {
-                successMessage.style.display = 'none';
-                form.reset();
-                
-                // Reset the image preview
-                imageUpload.innerHTML = `
-                    <i class="fas fa-camera"></i>
-                    <p>Upload a picture of the found ID card <span>(Optional)</span></p>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">Click to browse or drag and drop</p>
-                `;
-                idImageInput.value = '';
-            });
-        });
-    </script>
+  
 </body>
 </html>

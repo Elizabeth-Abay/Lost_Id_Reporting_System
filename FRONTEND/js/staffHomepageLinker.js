@@ -20,7 +20,7 @@ buttons.forEach(button => {
                 window.location.href = 'banStudent.html';
                 break;
             case 'Banned Student List':
-                window.location.href = 'bannedList.html';
+                window.location.href = 'UnBanStudent.html';
                 break;
             default:
                 console.log('Unknown action');

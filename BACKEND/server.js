@@ -4,9 +4,12 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const { pool } = require('./model/connect');
+const path = require('path');
+
 
 // Import routes
 const mainRoutes = require('./routes/mainRoutes');
+const { accessTokenGenerator } = require('./routes/generatingTokens')
 
 // Import services
 const {notificationService} = require('./service/notificationService');
@@ -36,6 +39,10 @@ const limiter = rateLimit({
     }
 });
 app.use('/api/', limiter);
+
+app.use('/token' , accessTokenGenerator )
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
