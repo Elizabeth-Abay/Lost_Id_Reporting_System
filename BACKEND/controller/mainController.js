@@ -4,10 +4,7 @@ const { notificationService } = require('../service/notificationService');
 const { ReportingLostAndFound } = require('../service/reportingLostAndFound');
 
 const { storage } = require('./multerConnector');
-
-
 const studentService = new StudentService();
-
 const reportLostAndFoundService = new ReportingLostAndFound();
 
 class StudentController {
@@ -501,9 +498,6 @@ class PublicController {
             else {
                 return res.status(400).json({ message: "Bad Request" })
             }
-
-
-
 
         } catch (error) {
             console.error("Error in PublicController.reportFoundId:", error.message);
