@@ -372,5 +372,4 @@ CREATE TRIGGER update_requestflow_timestamp
     FOR EACH ROW
     EXECUTE PROCEDURE update_timestamp();
 
-
 SELECT * FROM foundIdReport;
