@@ -41,6 +41,7 @@ router.post('/staff/accept-request', CheckHealthOfAccessToken ,isStaff , decline
 router.post('/staff/finalize-request', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.finalizeRequest);
 
 router.get('/staff/unsigned-requests', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getUnsignedRequests);
+router.get('/staff/final-approvals', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getFinalApprovalsForRegistry);
 router.get('/staff/rejected-requests', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getRejectedRequests);
 router.get('/staff/all-requests', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getAllRequests);
 router.get('/staff/request-details/:requestId', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getRequestDetails);

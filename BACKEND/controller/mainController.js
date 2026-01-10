@@ -312,10 +312,9 @@ class StaffController {
 
     async getUnsignedRequests(req, res) {
         try {
-            const { role } = req.decodedAccess; // From JWT middleware
-            console.log(role)
+            const { userId, role, department } = req.decodedAccess; // From JWT middleware
 
-            const result = await staffPrivillageObj.getUnSignedRequests({ role });
+            const result = await staffPrivillageObj.getUnSignedRequests({ role, userId, department });
 
             if (result.success) {
                 return res.status(200).json({ "result": result.data });
@@ -325,6 +324,35 @@ class StaffController {
 
         } catch (error) {
             console.error("Error in StaffController.getUnsignedRequests:", error.message);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error"
+            });
+        }
+    }
+
+    async getFinalApprovalsForRegistry(req, res) {
+        try {
+            const { userId, role } = req.decodedAccess; // From JWT middleware
+
+            // Only registry role can access this endpoint
+            if (role !== 'registral') {
+                return res.status(403).json({
+                    success: false,
+                    message: "Access denied. Registry role required."
+                });
+            }
+
+            const result = await staffPrivillageObj.getFinalApprovalsForRegistry({ userId });
+
+            if (result.success) {
+                return res.status(200).json({ "result": result.data });
+            } else {
+                return res.status(400).json(result);
+            }
+
+        } catch (error) {
+            console.error("Error in StaffController.getFinalApprovalsForRegistry:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"

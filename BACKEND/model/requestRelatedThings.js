@@ -161,32 +161,59 @@ async function getAllRejectedByMe(sentInfo) {
 
 async function getUnsignedByMe(sentInfo) {
     try {
-        let { role } = sentInfo;
+        let { role, userId, department } = sentInfo;
 
-        let colName = role + '_sign'
+        let colName = role + '_sign';
 
-        let result = await pool.query(
-            `SELECT policeDocument , id , id_number FROM requestFlow WHERE ${colName} IS NULL AND status = 'pending'`
-        )
+        
 
 
-        // console.log("Result from database query ",result.rows )
+        let query = `
+            SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department
+            FROM requestFlow rf
+            JOIN Users u ON rf.requester_id = u.id
+            WHERE ${colName} IS NULL AND rf.status = 'pending'
+        `;
 
-        // we will get policeDocument which is the image
-        // and the id of the request which will be made the div's id when sent to the frontend
+        let params = [];
+        let paramIndex = 1;
 
-        if (!result){
+        // If department head, filter by their department
+        if (role === 'department_head' && department) {
+            query += ` AND u.department = $${paramIndex}`;
+            params.push(department);
+            paramIndex++;
+        }
+
+
+        let result = await pool.query(query, params);
+
+        if (role.toLowerCase().trim() === 'registral'){
+            // then select only those that have previously been signed
+            result = pool.query(`SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department
+            FROM requestFlow rf
+            JOIN Users u ON rf.requester_id = u.id
+            WHERE  rf.status = 'pending'
+            AND library_sign IS NOT NULL
+            AND campuspolice_sign IS NOT NULL
+            AND finance_sign IS NOT NULL
+            AND bookstore_sign IS NOT NULL
+            AND departmenthead_sign  IS NOT NULL
+            ` )
+
+        }
+
+        if (!result) {
             return {
-                success : true,
-                rowCount : 0,
-                reason : "No more visible thing"
+                success: true,
+                rowCount: 0,
+                reason: "No more visible thing"
             }
         }
 
         return {
-            success : true,
-            data : result.rows
-            // result.rows is an array of { policedocument , id}
+            success: true,
+            data: result.rows
         }
 
     } catch (err) {
@@ -196,7 +223,49 @@ async function getUnsignedByMe(sentInfo) {
             reason: "Error while getUnsignedByMe"
         }
     }
-
 }
 
-module.exports = { rejectingARequest, acceptingRequest, checkingRightOfUnrejector, unrejectingReq, getAllRejectedByMe , getUnsignedByMe }
+async function getFinalApprovalsForRegistry(sentInfo) {
+    try {
+        // Registry can only see requests that have all other signatures but missing registry signature
+        let query = `
+            SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department,
+                   rf.library_sign, rf.campus_police_sign, rf.financial_sign, 
+                   rf.book_store_sign, rf.department_head_sign
+            FROM requestFlow rf
+            JOIN Users u ON rf.requester_id = u.id
+            WHERE rf.registral_sign IS NULL 
+            AND rf.status = 'pending'
+            AND rf.library_sign IS NOT NULL
+            AND rf.campus_police_sign IS NOT NULL
+            AND rf.financial_sign IS NOT NULL
+            AND rf.book_store_sign IS NOT NULL
+            AND rf.department_head_sign IS NOT NULL
+            ORDER BY rf.created_at ASC
+        `;
+
+        let result = await pool.query(query);
+
+        if (!result) {
+            return {
+                success: true,
+                rowCount: 0,
+                reason: "No requests ready for final approval"
+            }
+        }
+
+        return {
+            success: true,
+            data: result.rows
+        }
+
+    } catch (err) {
+        console.log("Error while getFinalApprovalsForRegistry ", err.message)
+        return {
+            success: false,
+            reason: "Error while getFinalApprovalsForRegistry"
+        }
+    }
+}
+
+module.exports = { rejectingARequest, acceptingRequest, checkingRightOfUnrejector, unrejectingReq, getAllRejectedByMe, getUnsignedByMe, getFinalApprovalsForRegistry }

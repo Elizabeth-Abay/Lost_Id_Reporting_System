@@ -1,5 +1,5 @@
 const { banStudent, unBanStudent, getAllBannedByMeModel } = require('../model/bannigAndUnbanningStudents');
-const { rejectingARequest, acceptingRequest, checkingRightOfUnrejector, unrejectingReq, getAllRejectedByMe, getUnsignedByMe } = require('../model/requestRelatedThings');
+const { rejectingARequest, acceptingRequest, checkingRightOfUnrejector, unrejectingReq, getAllRejectedByMe, getUnsignedByMe, getFinalApprovalsForRegistry } = require('../model/requestRelatedThings');
 const { pool } = require('../model/connect');
 
 class staffPrivilleges {
@@ -218,42 +218,57 @@ class staffPrivilleges {
 
 
     async getUnSignedRequests(sentInfo) {
-        // this is a get request and when the staff gets this then 
-        // in the front end make sure the div id that u will put the actual tables' id
-        // and this will send the police request for everyone who signed it
-        // when the request is unsigned we will need to have police request sent to every one 
         try {
-            // we query the requestFlow
-            // we need the column name only 
-            let { role } = sentInfo;
-            console.log(role)
-            // we get the role from the access Token
+            let { role, userId, department } = sentInfo;
+            console.log(role);
 
-            let result = await getUnsignedByMe({role});
-            // console.log(result)
+            let result = await getUnsignedByMe({ role, userId, department });
 
-            if (result.success){
+            if (result.success) {
                 return {
-                    success : true,
-                    data : result.data
+                    success: true,
+                    data: result.data
                 }
             }
 
             return {
-                success : false
+                success: false
             }
 
-            
-
-
-        } catch (err){
+        } catch (err) {
             console.log("Error while getUnSignedRequests ", err.message)
             return {
                 success: false,
                 reason: "Error while getUnSignedRequests"
             }
         }
+    }
 
+    async getFinalApprovalsForRegistry(sentInfo) {
+        try {
+            let { userId } = sentInfo;
+
+            let result = await getFinalApprovalsForRegistry({ userId });
+
+            if (result.success) {
+                return {
+                    success: true,
+                    data: result.data
+                }
+            }
+
+            return {
+                success: false,
+                reason: "Could not get final approvals"
+            }
+
+        } catch (err) {
+            console.log("Error while getFinalApprovalsForRegistry ", err.message)
+            return {
+                success: false,
+                reason: "Error while getFinalApprovalsForRegistry"
+            }
+        }
     }
 
     async gettingAllRejectedByMeService(sentInfo) {
