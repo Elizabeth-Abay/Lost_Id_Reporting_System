@@ -38,7 +38,7 @@ router.get('/staff/banned-students', CheckHealthOfAccessToken ,isStaff , decline
 router.post('/staff/reject-request', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.rejectRequest);
 router.post('/staff/unreject-request', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.unrejectRequest);
 router.post('/staff/accept-request', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.acceptRequest);
-router.post('/staff/finalize-request', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.finalizeRequest);
+// router.post('/staff/finalize-request', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.finalizeRequest);
 
 router.get('/staff/unsigned-requests', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getUnsignedRequests);
 router.get('/staff/final-approvals', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getFinalApprovalsForRegistry);

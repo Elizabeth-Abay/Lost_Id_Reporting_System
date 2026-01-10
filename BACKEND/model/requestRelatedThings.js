@@ -31,6 +31,8 @@ async function rejectingARequest(sentInfo) {
 
 async function acceptingRequest(sentInfo) {
     try {
+
+        console.log("accepting request is fired")
         // to accept a req means to update the requestFlow
         // there are columns with department names
         // so we need id of approver - from access token
@@ -38,13 +40,43 @@ async function acceptingRequest(sentInfo) {
         // so role = campus_police , library , registral , financial , book_store , department_head
         let { role, approverId, requestFlowId } = sentInfo;
 
-        let columnUpdated = role + '_sign';
+        const roleColumnMap = {
+            campus_police: 'campus_police',
+            library: 'library',
+            registral: 'registral',
+            financial: 'financial',
+            book_store: 'book_store',
+            department_head: 'department_head'
+        };
 
-        console.log(columnUpdated);
+        console.log(roleColumnMap.campus_police)
 
-        let result = await pool.query(`UPDATE requestFlow SET ${columnUpdated} = $1 WHERE id = $2`, [approverId, requestFlowId]);
 
-        if (!result) {
+        let columnUpdated = roleColumnMap[role.toLowerCase()];
+        console.log("columnUpdated" , columnUpdated);
+
+        if (!columnUpdated) {
+            return {
+                success: false,
+                reason: "role issue"
+            }
+        }
+
+        console.log("type of approverId", typeof (approverId));
+
+        console.log(requestFlowId)
+
+
+        const result = await pool.query(
+            `SELECT * FROM update_request_by_role($1 , $2 , $3)`,
+            [ columnUpdated , approverId, requestFlowId]
+        );
+
+        console.log(result);
+
+
+
+        if (result.rowCount === 0) {
             return {
                 success: false,
                 reason: "Updating the requestFlow from the acceptingRequest problem"
@@ -57,7 +89,7 @@ async function acceptingRequest(sentInfo) {
 
 
     } catch (err) {
-        console.log("Error while acceptingRequest ", err.message);
+        console.log("Error while acceptingRequest ", err);
         return {
             success: false,
             reason: "Error while acceptingRequest model "
@@ -165,7 +197,7 @@ async function getUnsignedByMe(sentInfo) {
 
         let colName = role + '_sign';
 
-        
+
 
 
         let query = `
@@ -188,7 +220,7 @@ async function getUnsignedByMe(sentInfo) {
 
         let result = await pool.query(query, params);
 
-        if (role.toLowerCase().trim() === 'registral'){
+        if (role.toLowerCase().trim() === 'registral') {
             // then select only those that have previously been signed
             result = pool.query(`SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department
             FROM requestFlow rf

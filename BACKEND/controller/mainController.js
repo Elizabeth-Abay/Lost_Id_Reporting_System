@@ -282,6 +282,8 @@ class StaffController {
         try {
             const { userId: approverId, role } = req.decodedAccess; // From JWT middleware
             const { requestFlowId } = req.body;
+            console.log("approverId0 " , approverId);
+            console.log("requestFlowId 0 " , requestFlowId)
 
             if (!requestFlowId) {
                 return res.status(400).json({

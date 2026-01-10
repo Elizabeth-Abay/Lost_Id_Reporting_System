@@ -10,7 +10,7 @@ async function refreshAccessToken() {
             return false;
         }
 
-        const response = await fetch('http://localhost:3000/token/refresh', {
+        const response = await fetch('http://localhost:3000/token/generateAccessToken', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
