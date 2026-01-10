@@ -17,8 +17,6 @@ const publicController = new PublicController();
 // signing up
 router.use('/' , LogInAndSignUpRouter)
 
-
-
 // Public routes (no authentication required)
 router.post('/found-id', publicController.reportFoundId);
 
@@ -46,8 +44,5 @@ router.get('/staff/rejected-requests', CheckHealthOfAccessToken ,isStaff , decli
 router.get('/staff/all-requests', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getAllRequests);
 router.get('/staff/request-details/:requestId', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getRequestDetails);
 router.get('/staff/dashboard', CheckHealthOfAccessToken ,isStaff , declineNonStaffUsers, staffController.getDashboardStats);
-
-
-
 
 module.exports = router;
