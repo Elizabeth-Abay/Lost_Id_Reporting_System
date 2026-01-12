@@ -49,32 +49,44 @@ async function acceptingRequest(sentInfo) {
             department_head: 'department_head'
         };
 
-        console.log(roleColumnMap.campus_police)
-
+        console.log("roleColumnMap.campus_police", roleColumnMap.campus_police);
 
         let columnUpdated = roleColumnMap[role.toLowerCase()];
-        console.log("columnUpdated" , columnUpdated);
+        console.log("columnUpdated", columnUpdated);
 
         if (!columnUpdated) {
             return {
                 success: false,
-                reason: "role issue"
+                reason: "Invalid role: " + role
             }
         }
 
         console.log("type of approverId", typeof (approverId));
+        console.log("approverId value:", approverId);
+        console.log("requestFlowId type:", typeof (requestFlowId));
+        console.log("requestFlowId value:", requestFlowId);
 
-        console.log(requestFlowId)
+        // Fix: Ensure UUIDs are properly handled - remove any quotes if present
+        let cleanApproverId = approverId;
+        let cleanRequestFlowId = requestFlowId;
+        
+        // Remove quotes if they exist (common issue with UUID handling)
+        if (typeof approverId === 'string' && approverId.startsWith("'")) {
+            cleanApproverId = approverId.replace(/'/g, '');
+        }
+        if (typeof requestFlowId === 'string' && requestFlowId.startsWith("'")) {
+            cleanRequestFlowId = requestFlowId.replace(/'/g, '');
+        }
 
+        console.log("Cleaned approverId:", cleanApproverId);
+        console.log("Cleaned requestFlowId:", cleanRequestFlowId);
 
         const result = await pool.query(
             `SELECT * FROM update_request_by_role($1 , $2 , $3)`,
-            [ columnUpdated , approverId, requestFlowId]
+            [columnUpdated, cleanApproverId, cleanRequestFlowId]
         );
 
         console.log(result);
-
-
 
         if (result.rowCount === 0) {
             return {
