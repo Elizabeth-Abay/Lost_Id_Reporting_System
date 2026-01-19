@@ -33,5 +33,46 @@ async function isStudentBanned(id) {
 
 }
 
+
+async function isStudentIdAndIdNumMatching(sentInfo) {
+    try{
+        let { userId, idNumber } = sentInfo;
+
+        let res = await pool.query(`SELECT id_number FROM Users WHERE id = $1` , [userId]);
+
+        if (res.rowCount === 0){
+            return {
+                success : false ,
+                reason : "Student Id doesn't exist"
+            }
+        }
+
+        let idNumberFromDb = res.rows[0]?.id_number;
+
+        // console.log(idNumberFromDb)
+
+        if (idNumberFromDb.toLowerCase() === idNumber.toLowerCase()){
+            return {
+                success : true
+            }
+        }
+
+        return {
+            success : false ,
+            reason : "Id number is mismatched"
+        }
+
+    
+
+    } catch (err){
+        console.log("Error while isStudentIdAndIdNumMatching from model layer" , err.message);
+        return {
+            success: false,
+            reason: "Error while isStudentIdAndIdNumMatching"
+        }
+    }
+    
+}
+
 // if success = false and reason = null means the student is not Banned
-module.exports = { isStudentBanned }
+module.exports = { isStudentBanned ,  isStudentIdAndIdNumMatching}

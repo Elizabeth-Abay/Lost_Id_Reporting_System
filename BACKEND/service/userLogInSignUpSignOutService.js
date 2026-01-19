@@ -27,7 +27,7 @@ const EventEmitter = require('events'); // emit and listen for events for when u
 
 
 // to talk with the database u need a function defined from the model
-const { createPendingUser, checkTheOTPmatches, deleteUserFromPendingState, updateOTP } = require('../model/userSignUpModel.js')
+const { createPendingUser, checkTheOTPmatches, deleteUserFromPendingState, updateOTP  , deleteUserFromPendingStateIfExistedBefore } = require('../model/userSignUpModel.js')
 const { welcomingUsersUponSignUp } = require('../events/userSignUpListener.js');
 
 
@@ -48,6 +48,10 @@ class SignUpHandler extends EventEmitter {
             // sentInfo = { id_number ,  role , email , password }
             // this is the function that will put the user inside the database
             console.log("userSignUp is called with ", sentInfo)
+
+            // when the user signs up then u need to create otp and stuff
+            // but if the user is found in the pendingUser table then like delete that and
+            // and like create that user anew
 
             // hash the password 
             let saltgen = await bcrypt.genSalt();
@@ -73,6 +77,19 @@ class SignUpHandler extends EventEmitter {
             // so use crypto with faster hashing algo
             let hashedOTP = crypto.createHash('sha1').update(OTP).digest('hex');
             // hash the otp with sha1 algo and create the hash with hexadecimal representation
+
+            // first check if that userExisted in pending users
+            // by sending the email and deleting if he existed from the pendingUser and delete
+
+            let res = await deleteUserFromPendingStateIfExistedBefore(sentInfo.email);
+
+            if (!res.success){
+                return {
+                    success : false,
+                    reason : "Error while deleteUserFromPendingStateIfExistedBefore"
+                }
+            }
+
 
 
             // request the model to insert the user into pending

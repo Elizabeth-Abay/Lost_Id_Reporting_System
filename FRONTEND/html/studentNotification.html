@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Notifications</title>
+  <link rel="stylesheet" href="../css/studentNotification.css">
+  <script src="../js/studentNotification.js" type="module" defer></script>
+</head>
+<body>
+
+  <div class="notifications-container">
+    <h2>Notifications</h2>
+    <p>Check your latest approvals, rejections, and found IDs.</p>
+
+    <div class="notification-section">
+      <h3>Recent Rejections</h3>
+      <ul id="rejectionsList" class="notification-list"></ul>
+    </div>
+
+    <div class="notification-section">
+      <h3>Recent Approvals</h3>
+      <ul id="approvalsList" class="notification-list"></ul>
+    </div>
+
+    <div class="notification-section">
+      <h3>Found IDs</h3>
+      <ul id="foundIdsList" class="notification-list"></ul>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+  </div>
+
+</body>
+</html>

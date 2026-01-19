@@ -3,6 +3,9 @@ const { staffPrivillageObj } = require('../service/staffPrivilleges');
 const { notificationService } = require('../service/notificationService');
 const { ReportingLostAndFound } = require('../service/reportingLostAndFound');
 
+const { storage } = require('./multerConnector');
+
+
 const studentService = new StudentService();
 
 const reportLostAndFoundService = new ReportingLostAndFound();
@@ -25,7 +28,7 @@ class StudentController {
             const result = await studentService.reportLostId({ userId, idNumber });
 
             if (result.success) {
-                return res.status(200).json(result);
+                return res.status(200).json({ "message": "Id report successful" });
             } else {
                 return res.status(400).json(result);
             }
@@ -41,8 +44,14 @@ class StudentController {
 
     async requestNewId(req, res) {
         try {
-            const { userId } = req.user; // From JWT middleware
-            const { idNumber, policeDocument } = req.body;
+            const { userId } = req.decodedAccess; // From JWT middleware
+            // as a middleware u will have the req.path
+            const policeDocument = req.file ? `/uploads/${req.file.filename}` : null;
+            // policeDocument is gonna be the path of the document
+            const { idNumber } = req.body;
+
+            console.log("New Id requested by ", idNumber)
+
 
             if (!idNumber || !policeDocument) {
                 return res.status(400).json({
@@ -52,6 +61,8 @@ class StudentController {
             }
 
             const result = await studentService.requestNewId({ userId, idNumber, policeDocument });
+
+            console.log("000result", result);
 
             if (result.success) {
                 return res.status(201).json(result);
@@ -70,7 +81,7 @@ class StudentController {
 
     async checkRequestStatus(req, res) {
         try {
-            const { userId } = req.user; // From JWT middleware
+            const { userId } = req.decodedAccess; // From JWT middleware
             const { idNumber } = req.params;
 
             const result = await studentService.checkRequestStatus({ userId, idNumber });
@@ -92,10 +103,29 @@ class StudentController {
 
     async getNotifications(req, res) {
         try {
-            const { userId } = req.user; // From JWT middleware
+            // the vision is to get the accepter and the rejector name
+            // function 
+            // accepts the student id and requester_id 
+            // join with users table for every 
+            // take that row
+            // status - rejected then query the rejected_requests table where rejected_request_id = rows id
+            // then give back the reason and  the rejector so that students can communicate them during office hours
+            
+            
+            // pending 
+            // then join with the users table and name , role - return mareg
+
+            // if status = rejected
+            // then join with rejected_requests on row.id = rejected_requests.rejected_request_id
+            // return the reason and join with users table and return rejected_requests.rejected_by
+            // return name , role
+            // something new here 
+            // first u need to have the positions set in the function returns and and the query result
+            const { userId } = req.decodedAccess; // From JWT middleware
 
             const result = await studentService.getStudentNotifications({ userId });
 
+            console.log("Result seen from controller " , result )
             if (result.success) {
                 return res.status(200).json(result);
             } else {
@@ -115,7 +145,8 @@ class StudentController {
 class StaffController {
     async banStudent(req, res) {
         try {
-            const { userId: bannedBy } = req.user; // From JWT middleware
+            const { userId: bannedBy } = req.decodedAccess; // From JWT middleware
+            // console.log(bannedBy)
             const { idNumber, reason } = req.body;
 
             if (!idNumber || !reason) {
@@ -147,8 +178,9 @@ class StaffController {
 
     async unBanStudent(req, res) {
         try {
-            const { userId: unBannedBy } = req.user; // From JWT middleware
+            const { userId: unBannedBy } = req.decodedAccess; // From JWT middleware
             const { idNumber } = req.body;
+            console.log("Trying to unban " , idNumber)
 
             if (!idNumber) {
                 return res.status(400).json({
@@ -179,7 +211,7 @@ class StaffController {
 
     async getBannedStudents(req, res) {
         try {
-            const { userId: bannerId } = req.user; // From JWT middleware
+            const { userId: bannerId } = req.decodedAccess; // From JWT middleware
 
             const result = await staffPrivillageObj.getAllBannedByMe({ bannerId });
 
@@ -200,8 +232,10 @@ class StaffController {
 
     async rejectRequest(req, res) {
         try {
-            const { userId: rejected_by } = req.user; // From JWT middleware
-            const { reason, rejected_request_Id } = req.body;
+            const { userId: rejected_by } = req.decodedAccess; // From JWT middleware
+            const { reason, rejectedRequestId } = req.body;
+
+            let rejected_request_Id = rejectedRequestId;
 
             if (!reason || !rejected_request_Id) {
                 return res.status(400).json({
@@ -232,8 +266,10 @@ class StaffController {
 
     async unrejectRequest(req, res) {
         try {
-            const { userId: unrejecterId } = req.user; // From JWT middleware
+            const { userId: unrejecterId } = req.decodedAccess; // From JWT middleware
             const { rejectedRequestId } = req.body;
+            // this is the id of the reject_request tables
+            // so when ppl want to see their unrejected list we return the id of the rejected_req table ie the primary key
 
             if (!rejectedRequestId) {
                 return res.status(400).json({
@@ -264,8 +300,11 @@ class StaffController {
 
     async acceptRequest(req, res) {
         try {
-            const { userId: approverId, role } = req.user; // From JWT middleware
+            const { userId: approverId, role } = req.decodedAccess; // From JWT middleware
             const { requestFlowId } = req.body;
+            // so the first thing expected here is the requestFlowId
+            console.log("approverId0 " , approverId);
+            console.log("requestFlowId 0 " , requestFlowId)
 
             if (!requestFlowId) {
                 return res.status(400).json({
@@ -296,12 +335,15 @@ class StaffController {
 
     async getUnsignedRequests(req, res) {
         try {
-            const { role } = req.user; // From JWT middleware
+            const { userId, role, department } = req.decodedAccess; // From JWT middleware
 
-            const result = await staffPrivillageObj.getUnSignedRequests({ role });
+
+            console.log("role from getUnsigned" , role);
+
+            const result = await staffPrivillageObj.getUnSignedRequests({ role, userId, department });
 
             if (result.success) {
-                return res.status(200).json(result);
+                return res.status(200).json({ "result": result.data });
             } else {
                 return res.status(400).json(result);
             }
@@ -315,9 +357,39 @@ class StaffController {
         }
     }
 
+    async getFinalApprovalsForRegistry(req, res) {
+        try {
+            const { userId, role } = req.decodedAccess; // From JWT middleware
+
+            // Only registry role can access this endpoint
+            if (role !== 'registral') {
+                return res.status(403).json({
+                    success: false,
+                    message: "Access denied. Registry role required."
+                });
+            }
+
+            const result = await staffPrivillageObj.getFinalApprovalsForRegistry({ userId });
+
+            if (result.success) {
+                return res.status(200).json({ "result": result.data });
+            } else {
+                return res.status(400).json(result);
+            }
+
+        } catch (error) {
+            console.error("Error in StaffController.getFinalApprovalsForRegistry:", error.message);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error"
+            });
+        }
+    }
+
     async getRejectedRequests(req, res) {
         try {
-            const { userId: rejectorId } = req.user; // From JWT middleware
+            const { userId: rejectorId } = req.decodedAccess; // From JWT middleware
+            console.log("Staff trying to get the requests they rejected " , rejectorId );
 
             const result = await staffPrivillageObj.gettingAllRejectedByMeService({ rejectorId });
 
@@ -391,7 +463,7 @@ class StaffController {
 
     async finalizeRequest(req, res) {
         try {
-            const { userId: staffId } = req.user; // From JWT middleware
+            const { userId: staffId } = req.decodedAccess; // From JWT middleware
             const { requestId } = req.body;
 
             if (!requestId) {
@@ -420,7 +492,7 @@ class StaffController {
 
     async getDashboardStats(req, res) {
         try {
-            const { userId: staffId } = req.user; // From JWT middleware
+            const { userId: staffId } = req.decodedAccess; // From JWT middleware
 
             const result = await staffPrivillageObj.getDashboardStats({ staffId });
 

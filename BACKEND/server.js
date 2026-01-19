@@ -4,9 +4,12 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const { pool } = require('./model/connect');
+const path = require('path');
+
 
 // Import routes
 const mainRoutes = require('./routes/mainRoutes');
+const { accessTokenGenerator } = require('./routes/generatingTokens')
 
 // Import services
 const {notificationService} = require('./service/notificationService');
@@ -27,48 +30,51 @@ app.use(helmet({
     },
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: {
-        error: 'Too many requests from this IP, please try again later.'
-    }
-});
-app.use('/api/', limiter);
+// // Rate limiting
+// const limiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, // 15 minutes
+//     max: 100, // limit each IP to 100 requests per windowMs
+//     message: {
+//         error: 'Too many requests from this IP, please try again later.'
+//     }
+// });
+// app.use('/api/', limiter);
+
+app.use('/token' , accessTokenGenerator )
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS configuration
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         // Allow requests with no origin (like mobile apps or curl requests)
+//         if (!origin) return callback(null, true);
         
-        // In development, allow all origins
-        if (process.env.NODE_ENV === 'development') {
-            return callback(null, true);
-        }
+//         // In development, allow all origins
+//         if (process.env.NODE_ENV === 'development') {
+//             return callback(null, true);
+//         }
         
-        // In production, specify allowed origins
-        const allowedOrigins = [
-            'http://localhost:8080',
-            'http://127.0.0.1:8080',
-            'https://yourdomain.com' // Add your production domain
-        ];
+//         // In production, specify allowed origins
+//         const allowedOrigins = '*'
         
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+//         if (allowedOrigins.indexOf(origin) !== -1) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     credentials: true,
+//     optionsSuccessStatus: 200
+// };
+app.use(cors({
+    origin : '*',
+    credentials : true
+}));
 
 // Compression middleware
 app.use(compression());
@@ -117,46 +123,46 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((error, req, res, next) => {
-    console.error('Global error handler:', error);
+// app.use((error, req, res, next) => {
+//     console.error('Global error handler:', error);
 
-    // Handle specific error types
-    if (error.name === 'ValidationError') {
-        return res.status(400).json({
-            success: false,
-            message: 'Validation Error',
-            errors: error.details
-        });
-    }
+//     // Handle specific error types
+//     if (error.name === 'ValidationError') {
+//         return res.status(400).json({
+//             success: false,
+//             message: 'Validation Error',
+//             errors: error.details
+//         });
+//     }
 
-    if (error.name === 'UnauthorizedError') {
-        return res.status(401).json({
-            success: false,
-            message: 'Unauthorized access'
-        });
-    }
+//     if (error.name === 'UnauthorizedError') {
+//         return res.status(401).json({
+//             success: false,
+//             message: 'Unauthorized access'
+//         });
+//     }
 
-    if (error.name === 'JsonWebTokenError') {
-        return res.status(401).json({
-            success: false,
-            message: 'Invalid token'
-        });
-    }
+//     if (error.name === 'JsonWebTokenError') {
+//         return res.status(401).json({
+//             success: false,
+//             message: 'Invalid token'
+//         });
+//     }
 
-    if (error.name === 'TokenExpiredError') {
-        return res.status(401).json({
-            success: false,
-            message: 'Token expired'
-        });
-    }
+//     if (error.name === 'TokenExpiredError') {
+//         return res.status(401).json({
+//             success: false,
+//             message: 'Token expired'
+//         });
+//     }
 
-    // Default error response
-    res.status(error.status || 500).json({
-        success: false,
-        message: error.message || 'Internal server error',
-        ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
-    });
-});
+//     // Default error response
+//     res.status(error.status || 500).json({
+//         success: false,
+//         message: error.message || 'Internal server error',
+//         ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+//     });
+// });
 
 
 const gracefulShutdown = async (signal) => {

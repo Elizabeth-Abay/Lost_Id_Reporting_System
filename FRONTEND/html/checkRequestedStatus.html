@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reported ID Status</title>
+  <link rel="stylesheet" href="../css/student.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Reported Lost IDs</h1>
+      <p>Check the status of your reported lost IDs.</p>
+    </div>
+    <div id="status-list" class="list-card">
+      <!-- Dynamically filled with JS -->
+    </div>
+    <button onclick="history.back()" class="action-btn secondary-btn">Back</button>
+  </div>
+
+  <script>
+    async function fetchReportedStatus() {
+      const accessToken = localStorage.getItem("accessToken");
+      const idNumber = prompt("Enter your ID number (e.g., UGR/3071/16):");
+      
+      const res = await fetch(`/student/status/${encodeURIComponent(idNumber)}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+      const data = await res.json();
+      
+      const list = document.getElementById('status-list');
+      list.innerHTML = '';
+      if (data.length === 0) {
+        list.innerHTML = '<p>No reported lost IDs found.</p>';
+        return;
+      }
+
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'request-item';
+        div.innerHTML = `
+          <div class="request-left">
+            <h3>${item.idNumber}</h3>
+            <p class="meta">Reported: ${item.dateReported}</p>
+          </div>
+          <div class="status">${item.status}</div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    fetchReportedStatus();
+  </script>
+</body>
+</html>
