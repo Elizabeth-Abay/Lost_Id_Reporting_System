@@ -31,6 +31,15 @@ async function refreshAccessToken() {
     }
 }
 
+
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('btn-accept')) {
+    handleUnreject(e.target.dataset.id);
+    // bc the html wont know the function definition if u use onClick and things like that
+  }
+});
+
+
 async function fetchRejectedRequests() {
     try {
         let access = localStorage.getItem("accessToken");
@@ -57,6 +66,8 @@ async function fetchRejectedRequests() {
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = '';
 
+        console.log("Result = " , res)
+
         if (response.ok && res.data && res.data.length > 0) {
             res.data.forEach(req => {
                 const card = createRejectedRequestCard(req);
@@ -75,19 +86,18 @@ async function fetchRejectedRequests() {
 function createRejectedRequestCard(req) {
     const div = document.createElement('div');
     div.className = 'request-card rejected-card';
-    div.id = `rejected-${req.id}`;
+    div.id = `${req.id}`;
 
     const createdDate = new Date(req.created_at).toLocaleDateString();
 
     div.innerHTML = `
         <div class="request-info">
-            <h3>Request ID: ${req.request_id || req.id}</h3>
             <p><strong>Student ID:</strong> ${req.id_number}</p>
             <p><strong>Rejected Date:</strong> ${createdDate}</p>
             <p><strong>Reason:</strong> ${req.reason}</p>
         </div>
         <div class="actions">
-            <button class="btn btn-accept" onclick="handleUnreject(${req.id})">Unreject</button>
+            <button class="btn btn-accept" data-id=${req.id}>Unreject</button>
         </div>
     `;
     return div;
@@ -104,7 +114,7 @@ async function handleUnreject(id) {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ 
-                    rejectedRequestId: parseInt(id)
+                    rejectedRequestId: id
                 })
             });
 

@@ -77,6 +77,67 @@ body {
   color: #1e3a8a;
 }
 
+
+/* Base notification item (shared styles) */
+.notification-item {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Headings inside notification items */
+.notification-item h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+/* Name / role / text */
+.notification-item h4 {
+    margin: 4px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #222;
+}
+
+/* ========================= */
+/* APPROVAL NOTIFICATION     */
+/* ========================= */
+.notification-item.approval {
+    border-left: 5px solid #2e7d32;
+    background: linear-gradient(135deg, #f4fff7, #ffffff);
+}
+
+.notification-item.approval h3 {
+    color: #2e7d32;
+}
+
+.notification-item.approval h4:nth-of-type(1) {
+    font-weight: 600;
+}
+
+/* ========================= */
+/* DEFAULT (FOUND ID)        */
+/* ========================= */
+.notification-item.default {
+    border-left: 5px solid #1565c0;
+    background: linear-gradient(135deg, #f3f8ff, #ffffff);
+}
+
+.notification-item.default h3 {
+    color: #1565c0;
+}
+
+.notification-item.default h4 {
+    color: #333;
+}
+
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }

@@ -189,6 +189,7 @@ class staffPrivilleges {
             // role and approverId = from token
             // requestFlowId = from frontEnd 
 
+            console.log("sentInfo in the staff privillage.acceptRequest " ,sentInfo );
             let { role, approverId, requestFlowId } = sentInfo;
 
             let result = await acceptingRequest({ role, approverId, requestFlowId });

@@ -45,6 +45,7 @@ async function refreshAccessToken() {
 async function fetchPendingRequests() {
     try {
         let access = localStorage.getItem("accessToken");
+        console.log("access token " , access)
         const response = await fetch('http://localhost:3000/user/staff/unsigned-requests', {
             method: "GET",
             headers: {
@@ -65,6 +66,7 @@ async function fetchPendingRequests() {
         }
 
         const res = await response.json();
+        console.log(res)
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = '';
 
@@ -201,17 +203,18 @@ document.getElementById('rejection-form').addEventListener('submit', async (e) =
     e.preventDefault();
     const id = document.getElementById('reject-request-id').value;
     const reason = document.getElementById('rejection-reason').value;
+    
 
     console.log('Reject form submitted for request ID:', id);
     console.log('Reject reason:', reason);
 
     try {
         let access = localStorage.getItem("accessToken");
-        console.log('Access token found for reject:', !!access);
+        console.log('Access token found for reject:' , access);
         
         const requestBody = { 
-            rejectedRequestId: parseInt(id),
-            reason: reason 
+            rejectedRequestId: id,
+            reason 
         };
         console.log('Reject request body:', requestBody);
         

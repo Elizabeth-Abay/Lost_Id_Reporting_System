@@ -52,3 +52,14 @@ Abebech Kebede - banned Student
 {"accessToken":"
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxYzM3Zjg4ZC0wNDQ0LTRlMjQtODdlZC1jMjhmZjk5ZDM3NTIiLCJyb2xlIjoiU3R1ZGVudCIsImV4cCI6MTc2NzgyNzExNiwiaWF0IjoxNzY3ODIzNTE2fQ.CbNiCT9GzP0gvkCnr5kIgJHs7AHsXyjrAgAUdAK36NE
 ","refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Njk1NTE1MTYuNDg4LCJyYW5kb21TdHJpbmciOiJlYzBkOTRlNGQyZjRlNjhiMzc0NmYyNmMwYjNlNDIzNjUwZjU5ZjllNGQ0ODJhNWM3MWM3YmM2M2I5ZWQ2MzJlYzdlOGI1ZGUyN2NmNjA4MjkwOTViYzE2NjhhODE2ZDcxYmZmMWFiOGQ3YzJjMzhjOGZlNzY0YzQzNDcxYTcyZSIsImlhdCI6MTc2NzgyMzUxNn0.0UWKJ3qVicVqliZXKzbAFIFV3Ib-P3xiBXtKrBRoOpM","role":"Student"}
+
+
+
+
+What to test now  
+First accept works reject - reason , button work
+Studetnts are not getting the accept and rejected stattus - done
+And department heads and registrals need to have special function for them
+In the registralsign then it will send notifications upon accepting - tried that 
+status - completed
+so select id and status  not completed

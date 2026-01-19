@@ -99,6 +99,10 @@ function attachUnbanListeners() {
           }
         );
 
+        let jsoned = await res.json();
+
+        console.log(jsoned)
+
         if (!res.ok) {
           throw new Error("Unban request failed");
         }

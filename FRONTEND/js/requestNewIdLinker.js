@@ -1,6 +1,6 @@
 const formNewId = document.getElementById('newIdForm');
 const statusMessage = document.getElementById('statusMessage');
-const submitBtn = document.getElementById("form-submitter");
+
 
 console.log(formNewId);
 
@@ -8,9 +8,7 @@ console.log(formNewId);
 const token = localStorage.getItem('accessToken');
 
 formNewId.addEventListener('submit', async (e) => {
-  console.log("Form submitted");
   e.preventDefault();
-  e.stopPropagation();
 
   const idNumber = document.getElementById('studentId').value.trim();
   const policeDocument = document.getElementById('policeDocument').files[0];
@@ -43,13 +41,13 @@ formNewId.addEventListener('submit', async (e) => {
       statusMessage.style.color = 'green';
     } else {
       // Show backend error message
-      statusMessage.innerText  = `❌ ${data.message || 'Submission failed.'}`;
+      statusMessage.innerText = `❌ ${data.message || 'Submission failed.'}`;
       statusMessage.style.color = 'red';
     }
 
   } catch (error) {
     console.error('Error submitting request:', error);
-    statusMessage.innerText  = '❌ Server error. Please try again later.';
+    statusMessage.innerText = '❌ Server error. Please try again later.';
     statusMessage.style.color = 'red';
   }
 });

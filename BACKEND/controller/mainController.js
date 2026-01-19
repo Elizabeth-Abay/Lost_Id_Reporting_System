@@ -103,10 +103,29 @@ class StudentController {
 
     async getNotifications(req, res) {
         try {
+            // the vision is to get the accepter and the rejector name
+            // function 
+            // accepts the student id and requester_id 
+            // join with users table for every 
+            // take that row
+            // status - rejected then query the rejected_requests table where rejected_request_id = rows id
+            // then give back the reason and  the rejector so that students can communicate them during office hours
+            
+            
+            // pending 
+            // then join with the users table and name , role - return mareg
+
+            // if status = rejected
+            // then join with rejected_requests on row.id = rejected_requests.rejected_request_id
+            // return the reason and join with users table and return rejected_requests.rejected_by
+            // return name , role
+            // something new here 
+            // first u need to have the positions set in the function returns and and the query result
             const { userId } = req.decodedAccess; // From JWT middleware
 
             const result = await studentService.getStudentNotifications({ userId });
 
+            console.log("Result seen from controller " , result )
             if (result.success) {
                 return res.status(200).json(result);
             } else {
@@ -161,6 +180,7 @@ class StaffController {
         try {
             const { userId: unBannedBy } = req.decodedAccess; // From JWT middleware
             const { idNumber } = req.body;
+            console.log("Trying to unban " , idNumber)
 
             if (!idNumber) {
                 return res.status(400).json({
@@ -282,6 +302,7 @@ class StaffController {
         try {
             const { userId: approverId, role } = req.decodedAccess; // From JWT middleware
             const { requestFlowId } = req.body;
+            // so the first thing expected here is the requestFlowId
             console.log("approverId0 " , approverId);
             console.log("requestFlowId 0 " , requestFlowId)
 
@@ -315,6 +336,9 @@ class StaffController {
     async getUnsignedRequests(req, res) {
         try {
             const { userId, role, department } = req.decodedAccess; // From JWT middleware
+
+
+            console.log("role from getUnsigned" , role);
 
             const result = await staffPrivillageObj.getUnSignedRequests({ role, userId, department });
 
@@ -365,6 +389,7 @@ class StaffController {
     async getRejectedRequests(req, res) {
         try {
             const { userId: rejectorId } = req.decodedAccess; // From JWT middleware
+            console.log("Staff trying to get the requests they rejected " , rejectorId );
 
             const result = await staffPrivillageObj.gettingAllRejectedByMeService({ rejectorId });
 

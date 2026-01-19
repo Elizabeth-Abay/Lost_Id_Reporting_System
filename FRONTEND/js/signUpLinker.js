@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
         deptHeadDepartmentSelect.required = false;
         deptHeadDepartmentSelect.value = "";
 
-        if (selectedStaffRole === "DepartmentHead") {
+        if (selectedStaffRole === "department_head") {
             deptHeadDepartmentGroup.classList.add("visible");
             deptHeadDepartmentSelect.required = true;
         }

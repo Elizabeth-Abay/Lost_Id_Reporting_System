@@ -23,6 +23,8 @@ async function loadNotifications() {
 
         const data = await response.json();
 
+        console.log("data from backend " , data)
+
         if (response.ok && data.success) {
             displayNotifications(data.data);
             statusMessage.textContent = '';
@@ -36,20 +38,57 @@ async function loadNotifications() {
 }
 
 
-function createReportNotificationItem(founderName , ContactInfo , type = 'default') {
+function createReportNotificationItem(item, type = 'default') {
     const div = document.createElement('div');
     div.className = `notification-item ${type}`;
-    div.innerHTML = `<p>found By : ${founderName} </p>
-    <p>contact Info : ${ContactInfo}</p>` ;
+    div.innerHTML = `<p>found By : ${item.founder_name} </p>
+    <p>contact Info : ${item.contact_info}</p>`;
     return div;
 }
 
 function createNotificationItem(text, type = 'default') {
     const div = document.createElement('div');
     div.className = `notification-item ${type}`;
-    div.textContent = text;
+
+    if(type === 'rejection' && text === 'No recent rejections.'){
+        console.log("Rejection is clicked")
+        div.textContent = text;
+        return div;
+    }
+
+    if(type === 'rejection'){
+        console.log("text from rejection " , text.name)
+        div.innerHTML = `<h3>Rejected By</h3>
+        <h4>${text.name}</h4><h4>${text.role}</h4><h3>${text.reason}</h3>
+        `
+    }
+
+
+    if (type === 'approval' && text === 'No recent approvals.'){
+        div.textContent = text;
+        return div;
+    } 
+
+    if (type === 'approval'){
+        div.innerHTML = `<h3>Approved By</h3>
+        <h4>${text.name}</h4><h4>${text.role}</h4>
+        `
+    }
+
+    if (type === 'default'){
+        div.innerHTML  = `
+        <h3>
+        ID FOUND
+        </h3>
+        <h4>${text.founder_name}</h4>
+        <h4>${text.contact_info}</h4>
+        `
+    }
+    
     return div;
 }
+
+
 
 function displayNotifications({ rejections, approvals, foundIds }) {
     console.log(rejections);
@@ -60,14 +99,14 @@ function displayNotifications({ rejections, approvals, foundIds }) {
     foundIdsList.innerHTML = '';
 
     // Rejections
-    if (rejections.length === 0) {
+    // empty array has a truthy value
+    let keyNums =  Object.keys(rejections).length;
+    if (keyNums === 0) {
         rejectionsList.appendChild(createNotificationItem('No recent rejections.', 'rejection'));
     } else {
-        rejections.forEach(item => {
-            rejectionsList.appendChild(
-                createNotificationItem(`ID: ${item.id} | Reason: ${item.reason} | Date: ${new Date(item.created_at).toLocaleString()}`, 'rejection')
-            );
-        });
+        rejectionsList.appendChild(
+            createNotificationItem(rejections, 'rejection')
+        );
     }
 
     // Approvals
@@ -76,7 +115,7 @@ function displayNotifications({ rejections, approvals, foundIds }) {
     } else {
         approvals.forEach(item => {
             approvalsList.appendChild(
-                createNotificationItem(`ID: ${item.id} | Approved on: ${new Date(item.updated_at).toLocaleString()}`, 'approval')
+                createNotificationItem(item , 'approval')
             );
         });
     }
@@ -87,7 +126,8 @@ function displayNotifications({ rejections, approvals, foundIds }) {
     } else {
         foundIds.forEach(item => {
             foundIdsList.appendChild(
-            createReportNotificationItem(item.founder_name , item.contact_info )            );
+                createReportNotificationItem(item));
+                // item = { founder_name , contact_info}
         });
     }
 }

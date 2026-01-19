@@ -115,7 +115,7 @@ class NotificationService {
                 SELECT u.email, u.name, rr.reason, rf.id_number
                 FROM Users u
                 JOIN requestFlow rf ON u.id = rf.requester_id
-                JOIN rejected_requests rr ON rf.rejection_id = rr.id
+                JOIN rejected_requests rr ON rf.id = rr.rejected_request_id
                 WHERE u.id = $1 AND rr.id = $2
             `, [data.requester_id, data.rejection_id]);
 
@@ -209,7 +209,7 @@ class NotificationService {
                         Congratulations! Your request for a new ID (ID: ${id_number}) has been approved.
                         
                         Your new ID is being processed and will be available for collection soon.
-                        You will receive another notification when it's ready for pickup.
+                        In the mean time ensure that you contact registrals to proceed to the payment process.
                         
                         Please keep this email for your records.
                         

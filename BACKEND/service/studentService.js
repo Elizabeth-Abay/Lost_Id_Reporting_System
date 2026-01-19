@@ -1,5 +1,5 @@
 const { pool } = require('../model/connect');
-const { isStudentBanned } = require('../model/checkingBannedOrNot');
+const { isStudentBanned , isStudentIdAndIdNumMatching } = require('../model/checkingBannedOrNot');
 const { insertingIntoLostIdReport } = require('../model/reportingLostAndFoundId');
 
 class StudentService {
@@ -70,6 +70,16 @@ class StudentService {
                     reason: "Student is banned from requesting new IDs"
                 };
             }
+
+            let isStudentRequestingHisOwnId = await isStudentIdAndIdNumMatching({userId, idNumber})
+
+            if (!isStudentRequestingHisOwnId.success){
+                return {
+                    success : false,
+                    reason : "Error checking isStudentRequestingHisOwnId"
+                }
+            }
+
 
             // Check if there's already a pending request
             const existingRequest = await pool.query(
@@ -173,34 +183,88 @@ class StudentService {
             // This would typically query a notifications table
             // For now, we'll return recent status changes
 
-            const recentRejections = await pool.query(
-                `SELECT rf.id, rf.status, rr.reason, rr.created_at
-                 FROM requestFlow rf
-                 JOIN rejected_requests rr ON rr.rejected_request_id = rf.id
-                 WHERE rf.requester_id = $1 AND rf.status = 'rejected'
-                 ORDER BY rr.created_at DESC
-                 LIMIT 5`,
+            const recentUpdatesOnRequest = await pool.query(
+                `SELECT * FROM getting_Notification_for_students($1)`,
                 [userId]
             );
 
-            const recentApprovals = await pool.query(
-                `SELECT rf.id, rf.status, rf.updated_at
-                 FROM requestFlow rf
-                 WHERE rf.requester_id = $1 AND rf.status = 'approved'
-                 ORDER BY rf.updated_at DESC
-                 LIMIT 5`,
-                [userId]
-            );
+            let result = recentUpdatesOnRequest.rows[0];
+            // this will be an object
+            console.log(result)
+            let rejections = {};
+
+            if (result.status_received === 'rejected'){
+                // then give back the name and role
+                rejections.name = result.rejector_name;
+                rejections.role = result.rejector_role;
+                rejections.reason = result.reason;
+            }
+
+            // approvals
+            let approvals = [];
+            // it will be an array of objects = { name , role}
+            // what if no one approved
+            let approverInfo = {};
+
+            let j = 0;
+            // j = 0 means u r on name
+            // j = 1 means u r on role
+
+            // loop in the array of keys
+            let KeyArray = Object.keys(result);
+
+            for (let x of KeyArray){
+                if (x === 'status_received') continue;
+
+                let value = result[x];
+
+                if (!value) break
+
+                if (value && j === 0){
+                    // means u r on name
+                    approverInfo.name = value;
+                    j++;
+                    continue;
+                }
+
+                if (value && j === 1){
+                    // means u r on name
+                    approverInfo.role = value;
+                    j--;
+                    approvals.push(approverInfo);
+
+                    approverInfo = {};
+
+                }
+
+            }
+
+            // console.log(approvals);
+            // console.log(rejections)
+
+
+            
+
 
             const foundIds = await pool.query(
-                `SELECT lr.id, lr.found_status, fr.founder_name, fr.contact_info, lr.created_at
+                `SELECT  lr.id , fr.founder_name, fr.contact_info 
                  FROM lostIdReport lr
                  JOIN foundIdReport fr ON lr.founded_by = fr.id
                  WHERE lr.user_id = $1 AND lr.found_status = true
-                 AND seen = FALSE
-                 LIMIT 5`,
+                 AND seen = FALSE`,
                 [userId]
             );
+
+            // if (foundIds.rows.length >= 1){
+            //     // then set the seen to true
+            //     let res = await pool.query(
+            //         `UPDATE lostIdReport 
+            //         SET seen = true
+            //         WHERE id = ${foundIds.rows.id}` 
+            //     )
+            // }
+
+            console.log("found id" , foundIds.rows[0]);
 
             // once we query the table then mark the state of the found id to be seen
             // so create array of the ids
@@ -209,14 +273,18 @@ class StudentService {
             // console.log(foundIds.rows)
 
             // then loop through obj
-            for (let rs of foundIds.rows) {
+            // foundIds.rows is an array of objects
+            let foundIdArray = foundIds.rows;
+
+            for (let rs of foundIdArray) {
                 // push the id of rs into the array
                 resultRows.push(rs.id);
             };
 
-            console.log(resultRows)
+            // console.log(resultRows)
 
 
+            // set the things  u have accepted seen = true
             let res = await pool.query(`
                 UPDATE lostIdReport 
                 SET seen = TRUE 
@@ -228,9 +296,9 @@ class StudentService {
             return {
                 success: true,
                 data: {
-                    rejections: recentRejections.rows,
-                    approvals: recentApprovals.rows,
-                    foundIds: foundIds.rows
+                    rejections,
+                    approvals,
+                    foundIds: foundIdArray
                 },
                 message: "Notifications retrieved successfully"
             };
@@ -244,5 +312,10 @@ class StudentService {
         }
     }
 }
+
+// let obj = new StudentService();
+// testing
+
+// obj.getStudentNotifications({userId : '8700fd90-6d15-4ef6-826f-b288445a4c99'})
 
 module.exports = { StudentService };

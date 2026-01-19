@@ -2,7 +2,6 @@ const banningForm = document.getElementById("banning-form");
 const idNumber = document.getElementById("studentId");
 const reason = document.getElementById("reason");
 const statusTxt = document.getElementById("status-text");
-const { renewAccessToken } = require('./tokenRenewer')
 
 
 
@@ -30,6 +29,7 @@ banningForm.addEventListener('submit', async (e) => {
             body: JSON.stringify(inputVals)
         });
 
+        let jsonIfied = await res.json();
      
 
         if (res.ok && jsonIfied.success) {
@@ -39,6 +39,10 @@ banningForm.addEventListener('submit', async (e) => {
             statusTxt.innerText = "Ban Unsuccessful";
             statusTxt.style.color = 'Red'
         }
+
+        idNumber.value = '';
+        reason.value = '';
+        
 
     } catch (err) {
         console.log("Error while banning ", err.message);

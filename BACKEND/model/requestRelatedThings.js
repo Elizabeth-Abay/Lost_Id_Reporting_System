@@ -3,6 +3,7 @@ const { pool } = require('./connect');
 async function rejectingARequest(sentInfo) {
     try {
         let { rejected_by, reason, rejected_request_Id } = sentInfo;
+        console.log(" rejected_by, ", rejected_by , " reason,  ", reason, " rejected_request_Id" , rejected_request_Id )
 
         // calling the procedure from the database
         let result = await pool.query('SELECT * FROM stopping_request_flow($1 , $2 , $3)', [rejected_by, reason, rejected_request_Id])
@@ -33,12 +34,13 @@ async function acceptingRequest(sentInfo) {
     try {
 
         console.log("accepting request is fired")
-        // to accept a req means to update the requestFlow
+        // to accept a req means to update the requestFlow table
         // there are columns with department names
         // so we need id of approver - from access token
         // we also know the role - from access token
         // so role = campus_police , library , registral , financial , book_store , department_head
         let { role, approverId, requestFlowId } = sentInfo;
+        console.log("role from acceptingRequest in reqRelatedThings ", role)
 
         const roleColumnMap = {
             campus_police: 'campus_police',
@@ -49,7 +51,7 @@ async function acceptingRequest(sentInfo) {
             department_head: 'department_head'
         };
 
-        console.log("roleColumnMap.campus_police", roleColumnMap.campus_police);
+        // console.log("roleColumnMap.campus_police", roleColumnMap.campus_police);
 
         let columnUpdated = roleColumnMap[role.toLowerCase()];
         console.log("columnUpdated", columnUpdated);
@@ -61,29 +63,29 @@ async function acceptingRequest(sentInfo) {
             }
         }
 
-        console.log("type of approverId", typeof (approverId));
-        console.log("approverId value:", approverId);
-        console.log("requestFlowId type:", typeof (requestFlowId));
-        console.log("requestFlowId value:", requestFlowId);
+        // console.log("type of approverId", typeof (approverId));
+        // console.log("approverId value:", approverId);
+        // console.log("requestFlowId type:", typeof (requestFlowId));
+        // console.log("requestFlowId value:", requestFlowId);
 
-        // Fix: Ensure UUIDs are properly handled - remove any quotes if present
-        let cleanApproverId = approverId;
-        let cleanRequestFlowId = requestFlowId;
-        
-        // Remove quotes if they exist (common issue with UUID handling)
-        if (typeof approverId === 'string' && approverId.startsWith("'")) {
-            cleanApproverId = approverId.replace(/'/g, '');
-        }
-        if (typeof requestFlowId === 'string' && requestFlowId.startsWith("'")) {
-            cleanRequestFlowId = requestFlowId.replace(/'/g, '');
-        }
+        // // Fix: Ensure UUIDs are properly handled - remove any quotes if present
+        // let cleanApproverId = approverId;
+        // let cleanRequestFlowId = requestFlowId;
 
-        console.log("Cleaned approverId:", cleanApproverId);
-        console.log("Cleaned requestFlowId:", cleanRequestFlowId);
+        // // Remove quotes if they exist (common issue with UUID handling)
+        // if (typeof approverId === 'string' && approverId.startsWith("'")) {
+        //     cleanApproverId = approverId.replace(/'/g, '');
+        // }
+        // if (typeof requestFlowId === 'string' && requestFlowId.startsWith("'")) {
+        //     cleanRequestFlowId = requestFlowId.replace(/'/g, '');
+        // }
+
+        // console.log("Cleaned approverId:", cleanApproverId);
+        // console.log("Cleaned requestFlowId:", cleanRequestFlowId);
 
         const result = await pool.query(
             `SELECT * FROM update_request_by_role($1 , $2 , $3)`,
-            [columnUpdated, cleanApproverId, cleanRequestFlowId]
+            [columnUpdated, requestFlowId, approverId]
         );
 
         console.log(result);
@@ -177,7 +179,12 @@ async function getAllRejectedByMe(sentInfo) {
     try {
         let { rejectorId } = sentInfo;
         let result = await pool.query(
-            'SELECT * FROM rejected_requests WHERE  rejected_by = $1', [rejectorId]
+            `SELECT  rr.id , rr.reason , rr.created_at , u.name , u.id_number 
+            FROM rejected_requests AS rr
+            JOIN requestFlow AS rf ON rr.rejected_request_id = rf.id
+            JOIN Users AS u ON rf.requester_id = u.id
+            WHERE  rr.rejected_by = $1;
+            `, [rejectorId]
         )
 
         if (!result) {
@@ -186,6 +193,8 @@ async function getAllRejectedByMe(sentInfo) {
                 reason: "No thing got"
             }
         }
+
+        console.log("Result received " ,  result.rows)
 
         return {
             success: true,
@@ -207,45 +216,82 @@ async function getUnsignedByMe(sentInfo) {
     try {
         let { role, userId, department } = sentInfo;
 
-        let colName = role + '_sign';
+
+        const roleColumnMap = {
+            campus_police: 'campuspolice_sign',
+            library: 'library_sign',
+            registral: 'registral_sign',
+            financial: 'finance_sign',
+            book_store: 'bookstore_sign',
+            department_head: 'departmenthead_sign'
+        };
+
+        // console.log("roleColumnMap.campus_police", roleColumnMap.campus_police);
+
+        let columnUpdated = roleColumnMap[role.toLowerCase()];
+        console.log("columnUpdated", columnUpdated);
 
 
+        // so here get the department from the table or acces token
 
 
         let query = `
             SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department
             FROM requestFlow rf
             JOIN Users u ON rf.requester_id = u.id
-            WHERE ${colName} IS NULL AND rf.status = 'pending'
+            WHERE ${columnUpdated} IS NULL AND rf.status = 'pending'
         `;
 
         let params = [];
-        let paramIndex = 1;
 
         // If department head, filter by their department
-        if (role === 'department_head' && department) {
-            query += ` AND u.department = $${paramIndex}`;
-            params.push(department);
-            paramIndex++;
+        if (role === 'department_head') {
+            // first get the department they are heading from users table
+            let result = await pool.query(
+                `SELECT department FROM Users WHERE id = $1`, [userId]
+            );
+
+            let depHeaded = result.rows[0].department
+
+            query = `
+                SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department
+                FROM requestFlow rf
+                JOIN Users u ON rf.requester_id = u.id
+                WHERE 
+                    ${columnUpdated} IS NULL 
+                    AND 
+                    rf.status = 'pending'
+                    AND 
+                    u.department = $1
+            `
+            params.push(depHeaded)
         }
 
 
+        if (role === 'registral') {
+            // then only get items that are signed by all the others 
+            // and also notify the students and set status to be approved 
+            // select items where there are no null columns
+
+            query = `
+                SELECT * 
+                FROM requestFlow
+                WHERE  registral_sign IS NULL
+                AND status = 'pending'
+                AND num_nulls(
+                library_sign ,
+                campuspolice_sign,
+                finance_sign,
+                bookstore_sign,
+                departmenthead_sign
+            ) = 0
+            `
+        }
+
+
+        console.log("query")
         let result = await pool.query(query, params);
-
-        if (role.toLowerCase().trim() === 'registral') {
-            // then select only those that have previously been signed
-            result = pool.query(`SELECT rf.policeDocument, rf.id, rf.id_number, u.name as student_name, u.department as student_department
-            FROM requestFlow rf
-            JOIN Users u ON rf.requester_id = u.id
-            WHERE  rf.status = 'pending'
-            AND library_sign IS NOT NULL
-            AND campuspolice_sign IS NOT NULL
-            AND finance_sign IS NOT NULL
-            AND bookstore_sign IS NOT NULL
-            AND departmenthead_sign  IS NOT NULL
-            ` )
-
-        }
+        console.log("result from getting Unsigned 0 ", result.rows)
 
         if (!result) {
             return {
@@ -311,5 +357,9 @@ async function getFinalApprovalsForRegistry(sentInfo) {
         }
     }
 }
+
+
+
+
 
 module.exports = { rejectingARequest, acceptingRequest, checkingRightOfUnrejector, unrejectingReq, getAllRejectedByMe, getUnsignedByMe, getFinalApprovalsForRegistry }
