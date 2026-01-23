@@ -1,3 +1,6 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchPendingRequests();
 });
@@ -13,35 +16,6 @@ document.addEventListener('click', (e) => {
 
 
 
-// Token renewal function
-async function refreshAccessToken() {
-    try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-            return false;
-        }
-
-        const response = await fetch('http://localhost:3000/token/generateAccessToken', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ refreshToken })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('accessToken', data.accessToken);
-            return true;
-        } else {
-            return false;
-        }
-    } catch (error) {
-        console.error('Token refresh failed:', error);
-        return false;
-    }
-}
-
 async function fetchPendingRequests() {
     try {
         let access = localStorage.getItem("accessToken");
@@ -56,9 +30,9 @@ async function fetchPendingRequests() {
 
         // Handle token expiration
         if (response.status === 401) {
-            const refreshed = await refreshAccessToken();
-            if (refreshed) {
-                return fetchPendingRequests(); // Retry with new token
+            const refreshed = await requestAccess();
+            if (refreshed.success) {
+                return;
             } else {
                 window.location.href = '../html/login.html';
                 return;
@@ -79,7 +53,7 @@ async function fetchPendingRequests() {
             grid.innerHTML = `<p class="form-subtitle">No pending requests found.</p>`;
         }
     } catch (err) {
-        console.error("Fetch error:", err);
+        console.log("Fetch error:", err.message);
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = `<p class="form-subtitle">Error loading requests. Please try again.</p>`;
     }
@@ -116,8 +90,8 @@ async function handleAccept(id) {
             // Handle token expiration
             if (response.status === 401) {
                 console.log('Token expired, attempting refresh...');
-                const refreshed = await refreshAccessToken();
-                if (refreshed) {
+                const refreshed = await requestAccess();
+                if (refreshed.success) {
                     console.log('Token refreshed, retrying...');
                     return handleAccept(id); // Retry with new token
                 } else {
@@ -140,11 +114,11 @@ async function handleAccept(id) {
                 // Refresh the list
                 fetchPendingRequests();
             } else {
-                console.error('Accept request failed:', result);
+                console.log('Accept request failed:', result);
                 alert(`Error accepting request: ${result.message || result.reason || 'Unknown error'}`);
             }
         } catch (error) {
-            console.error('Error accepting request:', error);
+            console.log('Error accepting request:', error);
             alert('Error accepting request. Please try again.');
         }
     }
@@ -232,8 +206,8 @@ document.getElementById('rejection-form').addEventListener('submit', async (e) =
         // Handle token expiration
         if (response.status === 401) {
             console.log('Token expired during reject, attempting refresh...');
-            const refreshed = await refreshAccessToken();
-            if (refreshed) {
+            const refreshed = await requestAccess();
+            if (refreshed.success) {
                 console.log('Token refreshed, retrying reject...');
                 // Retry the request
                 return document.getElementById('rejection-form').dispatchEvent(new Event('submit'));
@@ -258,11 +232,11 @@ document.getElementById('rejection-form').addEventListener('submit', async (e) =
             // Refresh the list
             fetchPendingRequests();
         } else {
-            console.error('Reject request failed:', result);
+            console.log('Reject request failed:', result);
             alert(`Error rejecting request: ${result.message || result.reason || 'Unknown error'}`);
         }
     } catch (error) {
-        console.error('Error rejecting request:', error);
+        console.log('Error rejecting request:', error);
         alert('Error rejecting request. Please try again.');
     }
 });

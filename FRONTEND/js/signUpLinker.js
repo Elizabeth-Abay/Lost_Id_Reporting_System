@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 showStatus("Something went wrong. Please try again later.", "error");
             }
         } catch (error) {
-            console.error(error);
+            console.log(error);
             showStatus("Unable to connect to server.", "error");
         }
     });

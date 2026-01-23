@@ -55,7 +55,9 @@ function CheckHealthOfAccessToken(req, res, next) {
 		// authorization : Bearer Token - string
 
 		if (!authHeader) {
-			res.status(401).send("No accessToken provided");
+			res.status(401).json({
+				"message" : "No accessToken provided"
+		});
 			return;
 		}
 

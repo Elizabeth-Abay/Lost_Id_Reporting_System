@@ -1,5 +1,4 @@
 // there are buttons when clicked move to a different page
-
 const buttons = document.querySelectorAll('.action-btn');
 
 buttons.forEach(button => {

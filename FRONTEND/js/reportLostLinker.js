@@ -1,3 +1,6 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
+
 // reportLostLinker.js
 const submitLostReport = document.getElementById("lost-Id-Report");
 const idNumberInput = document.getElementById("studentId");
@@ -36,6 +39,12 @@ submitLostReport.addEventListener('submit', async (e) => {
             body: JSON.stringify({ idNumber: val })
         });
 
+
+        if (response.status === 401) {
+            console.log("Access token expired")
+            await requestAccess();
+        }
+
         let result = await response.json();
 
         if (response.ok && result.message) {
@@ -45,7 +54,7 @@ submitLostReport.addEventListener('submit', async (e) => {
         }
 
     } catch (err){
-        console.error("Error while reporting lost ID:", err);
+        console.log("Error while reporting lost ID:", err);
         showStatus("Unable to connect to server", 'error');
     }
 });

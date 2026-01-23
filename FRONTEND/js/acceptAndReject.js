@@ -1,3 +1,5 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
 const backdrop = document.getElementById('modalBackdrop');
 const reasonInput = document.getElementById('rejectReason');
 const submitReject = document.getElementById('submitReject');

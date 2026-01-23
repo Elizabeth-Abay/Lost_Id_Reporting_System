@@ -1,4 +1,3 @@
-// app.js
 const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -55,7 +54,7 @@ loginForm.addEventListener('submit', async (e) => {
             alert(result.reason || "Login failed. Please check your credentials.");
         }
     } catch (err) {
-        console.error("Login Error:", err);
+        console.log("Login Error:", err);
         alert("An error occurred while logging in. Please try again later.");
     }
 });

@@ -34,7 +34,7 @@ class StudentController {
             }
 
         } catch (error) {
-            console.error("Error in StudentController.reportLostId:", error.message);
+            console.log("Error in StudentController.reportLostId:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -71,7 +71,7 @@ class StudentController {
             }
 
         } catch (error) {
-            console.error("Error in StudentController.requestNewId:", error.message);
+            console.log("Error in StudentController.requestNewId:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -93,7 +93,7 @@ class StudentController {
             }
 
         } catch (error) {
-            console.error("Error in StudentController.checkRequestStatus:", error.message);
+            console.log("Error in StudentController.checkRequestStatus:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -133,7 +133,7 @@ class StudentController {
             }
 
         } catch (error) {
-            console.error("Error in StudentController.getNotifications:", error.message);
+            console.log("Error in StudentController.getNotifications:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -168,7 +168,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.banStudent:", error.message);
+            console.log("Error in StaffController.banStudent:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -201,7 +201,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.unBanStudent:", error.message);
+            console.log("Error in StaffController.unBanStudent:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -222,7 +222,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getBannedStudents:", error.message);
+            console.log("Error in StaffController.getBannedStudents:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -256,7 +256,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.rejectRequest:", error.message);
+            console.log("Error in StaffController.rejectRequest:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -290,7 +290,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.unrejectRequest:", error.message);
+            console.log("Error in StaffController.unrejectRequest:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -325,7 +325,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.acceptRequest:", error.message);
+            console.log("Error in StaffController.acceptRequest:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -349,7 +349,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getUnsignedRequests:", error.message);
+            console.log("Error in StaffController.getUnsignedRequests:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -378,7 +378,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getFinalApprovalsForRegistry:", error.message);
+            console.log("Error in in StaffController.getFinalApprovalsForRegistry:", error.message); 
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -400,7 +400,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getRejectedRequests:", error.message);
+            console.log("Error in StaffController.getRejectedRequests:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -425,7 +425,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getAllRequests:", error.message);
+            console.log("Error in StaffController.getAllRequests:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -453,7 +453,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getRequestDetails:", error.message);
+            console.log("Error in StaffController.getRequestDetails:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -482,7 +482,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.finalizeRequest:", error.message);
+            console.log("Error in StaffController.finalizeRequest:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -503,7 +503,7 @@ class StaffController {
             }
 
         } catch (error) {
-            console.error("Error in StaffController.getDashboardStats:", error.message);
+            console.log("Error in StaffController.getDashboardStats:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"
@@ -533,7 +533,7 @@ class PublicController {
 
 
         } catch (error) {
-            console.error("Error in PublicController.reportFoundId:", error.message);
+            console.log("Error in PublicController.reportFoundId:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error"

@@ -1,4 +1,6 @@
 // Student Dashboard Module
+import  {requestAccess} from './requestingAccessFromRef.js';
+
 class StudentDashboard {
     static async loadDashboard() {
         const container = document.getElementById('dashboardContainer');

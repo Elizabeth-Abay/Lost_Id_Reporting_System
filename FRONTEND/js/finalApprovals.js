@@ -1,3 +1,6 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchFinalApprovals();
 });
@@ -18,6 +21,11 @@ async function refreshAccessToken() {
             body: JSON.stringify({ refreshToken })
         });
 
+        if (response.status === 401) {
+            console.log("Access token expired")
+            await requestAccess();
+        }
+
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem('accessToken', data.accessToken);
@@ -26,7 +34,7 @@ async function refreshAccessToken() {
             return false;
         }
     } catch (error) {
-        console.error('Token refresh failed:', error);
+        console.logToken refresh failed:', error);
         return false;
     }
 }
@@ -66,7 +74,7 @@ async function fetchFinalApprovals() {
             grid.innerHTML = `<p class="form-subtitle">No requests ready for final approval.</p>`;
         }
     } catch (err) {
-        console.error("Fetch error:", err);
+        console.log("Fetch error:", err);
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = `<p class="form-subtitle">Error loading requests. Please try again.</p>`;
     }
@@ -154,7 +162,7 @@ async function handleFinalize(id) {
                 alert(`Error finalizing request: ${result.message || 'Unknown error'}`);
             }
         } catch (error) {
-            console.error('Error finalizing request:', error);
+            console.log('Error finalizing request:', error);
             alert('Error finalizing request. Please try again.');
         }
     }
@@ -217,7 +225,7 @@ document.getElementById('rejection-form').addEventListener('submit', async (e) =
             alert(`Error rejecting request: ${result.message || 'Unknown error'}`);
         }
     } catch (error) {
-        console.error('Error rejecting request:', error);
+        console.log('Error rejecting request:', error);
         alert('Error rejecting request. Please try again.');
     }
 });

@@ -43,7 +43,7 @@ class StudentService {
             };
 
         } catch (error) {
-            console.error("Error in StudentService.reportLostId:", error.message);
+            console.log("Error in StudentService.reportLostId:", error.message);
             return {
                 success: false,
                 reason: "Internal server error while reporting lost ID"
@@ -57,6 +57,8 @@ class StudentService {
 
             // First check if student is banned
             const bannedCheck = await isStudentBanned(idNumber);
+
+            // console.log("Banned Checker returned " , bannedCheck)
             if (!bannedCheck.success) {
                 return {
                     success: false,
@@ -116,7 +118,7 @@ class StudentService {
             };
 
         } catch (error) {
-            console.error("Error in StudentService.requestNewId:", error.message);
+            console.log("Error in StudentService.requestNewId:", error.message);
             return {
                 success: false,
                 reason: "Internal server error while requesting new ID"
@@ -167,7 +169,7 @@ class StudentService {
             };
 
         } catch (error) {
-            console.error("Error in StudentService.checkRequestStatus:", error.message);
+            console.log("Error in StudentService.checkRequestStatus:", error.message);
             return {
                 success: false,
                 reason: "Internal server error while checking request status"
@@ -304,7 +306,7 @@ class StudentService {
             };
 
         } catch (error) {
-            console.error("Error in  StudentService.getStudentNotifications:", error.message);
+            console.log("Error in  StudentService.getStudentNotifications:", error.message);
             return {
                 success: false,
                 reason: "Internal server error while retrieving notifications"

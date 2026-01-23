@@ -1,35 +1,9 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchRejectedRequests();
 });
-
-// Token renewal function
-async function refreshAccessToken() {
-    try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-            return false;
-        }
-
-        const response = await fetch('http://localhost:3000/token/generateAccessToken', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ refreshToken })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('accessToken', data.accessToken);
-            return true;
-        } else {
-            return false;
-        }
-    } catch (error) {
-        console.error('Token refresh failed:', error);
-        return false;
-    }
-}
 
 
 document.addEventListener('click', (e) => {
@@ -53,8 +27,8 @@ async function fetchRejectedRequests() {
 
         // Handle token expiration
         if (response.status === 401) {
-            const refreshed = await refreshAccessToken();
-            if (refreshed) {
+            const refreshed = await requestAccess();;
+            if (refreshed.success) {
                 return fetchRejectedRequests(); // Retry with new token
             } else {
                 window.location.href = '../html/login.html';
@@ -77,7 +51,7 @@ async function fetchRejectedRequests() {
             grid.innerHTML = `<p class="form-subtitle">No rejected requests found.</p>`;
         }
     } catch (err) {
-        console.error("Fetch error:", err);
+        console.log("Fetch error:", err);
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = `<p class="form-subtitle">Error loading rejected requests. Please try again.</p>`;
     }
@@ -120,8 +94,8 @@ async function handleUnreject(id) {
 
             // Handle token expiration
             if (response.status === 401) {
-                const refreshed = await refreshAccessToken();
-                if (refreshed) {
+                const refreshed = await requestAccess();;
+                if (refreshed.success) {
                     return handleUnreject(id); // Retry with new token
                 } else {
                     window.location.href = '../html/login.html';
@@ -144,7 +118,7 @@ async function handleUnreject(id) {
                 alert(`Error unrejecting request: ${result.message || 'Unknown error'}`);
             }
         } catch (error) {
-            console.error('Error unrejecting request:', error);
+            console.log('Error unrejecting request:', error);
             alert('Error unrejecting request. Please try again.');
         }
     }

@@ -52,7 +52,7 @@ const authenticateToken = async (req, res, next) => {
                 message: 'Token expired'
             });
         } else {
-            console.error('Authentication error:', error.message);
+            console.logAuthentication error:', error.message);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error during authentication'
@@ -121,7 +121,7 @@ const validateRequestParams = (requiredParams) => {
 
 // Error handling middleware
 const errorHandler = (err, req, res, next) => {
-    console.error('Error:', err.message);
+    console.log('Error:', err.message);
     
     // Handle specific error types
     if (err.name === 'ValidationError') {

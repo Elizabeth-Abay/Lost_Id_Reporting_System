@@ -42,7 +42,7 @@ const sendEmailNotification = async (emailContent) => {
         };
         
     } catch (error) {
-        console.error('Error sending email:', error.message);
+        console.logror sending email:', error.message);
         return {
             success: false,
             error: error.message
@@ -67,7 +67,7 @@ const testEmailService = async () => {
             
             console.log('Test email sent:', nodemailer.getTestMessageUrl(info));
         } catch (error) {
-            console.error('Test email failed:', error.message);
+            console.logTest email failed:', error.message);
         }
     }
 };

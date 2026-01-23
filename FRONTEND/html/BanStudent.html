@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ban Student</title>
     <link rel="stylesheet" href="../css/banStudent.css">
-    <script src = "../js/banStudentLinker.js" type="module"></script>
+    <script src="../js/banStudentLinker.js" type="module"></script>
+    <script type="module" src="../js/requestingAccessFromRef.js"></script>
+
 </head>
 
 <body>
@@ -20,11 +22,11 @@
             lifted.
         </div>
 
-        <form id = "banning-form">
+        <form id="banning-form">
             <div class="row">
                 <div>
                     <label for="studentId">Student ID</label>
-                    <input name = "idNumber" type="text" id="studentId" placeholder="STU-20491" required />
+                    <input name="idNumber" type="text" id="studentId" placeholder="STU-20491" required />
                 </div>
 
 
@@ -32,7 +34,7 @@
 
             <div>
                 <label for="reason">Reason for Ban</label>
-                <textarea name = "reason" id="reason" placeholder="Clearly explain the reason for banning this student..."
+                <textarea name="reason" id="reason" placeholder="Clearly explain the reason for banning this student..."
                     required></textarea>
             </div>
 
@@ -43,7 +45,7 @@
                 <button type="submit" class="btn btn-ban">Confirm Ban</button>
             </div>
 
-            <div id = "status-text"></div>
+            <div id="status-text"></div>
         </form>
     </div>
 

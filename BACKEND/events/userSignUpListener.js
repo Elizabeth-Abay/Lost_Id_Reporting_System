@@ -46,7 +46,7 @@ async function welcomingUsersUponSignUp(emailInfo) {
     let { email } = emailInfo;
 
     let emailSentOut = {
-      from: `Lost Id Reporting`,
+      from: '"Lost ID System" <noreply@lostid.system>',
       to: email,
       subject: 'WELCOME MESSAGE',
       html: `<!DOCTYPE html>

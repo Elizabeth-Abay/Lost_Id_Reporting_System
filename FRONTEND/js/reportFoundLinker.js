@@ -1,3 +1,6 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
+
 let reportFoundForm = document.getElementById("reportFoundForm");
 
 console.log(reportFoundForm);
@@ -19,6 +22,12 @@ reportFoundForm.addEventListener('submit' , async (e) => {
             },
             body : JSON.stringify(Obj)
         })
+
+
+        if (res.status === 401) {
+            console.log("Access token expired")
+            await requestAccess();
+        }
 
         if (res.ok){
             alert('Thank you. Report made successfully');

@@ -5,6 +5,8 @@
 // and http://localhost:3000/user/staff/unban-student - when u click the unban button in the website
 // in both cases u have to send the accessToken inside the header
 
+import  {requestAccess} from './requestingAccessFromRef.js';
+
 
 document.addEventListener("DOMContentLoaded", () => {
   loadBannedStudents();
@@ -24,6 +26,12 @@ async function loadBannedStudents() {
         }
       }
     );
+
+
+    if (res.status === 401) {
+            console.log("Access token expired")
+            await requestAccess();
+        }
 
     if (!res.ok) {
       throw new Error("Failed to fetch banned students");
@@ -69,7 +77,7 @@ async function loadBannedStudents() {
     attachUnbanListeners();
 
   } catch (err) {
-    console.error(err);
+    console.log(err);
     alert("Error loading banned students");
   }
 }
@@ -117,7 +125,7 @@ function attachUnbanListeners() {
         }
 
       } catch (err) {
-        console.error(err);
+        console.log(err);
         alert("Failed to unban student");
         btn.disabled = false;
         btn.textContent = "Unban";

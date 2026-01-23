@@ -4,7 +4,7 @@ const resendBtn = document.getElementById("resendBtn");
 const errorMsg = document.getElementById("errorMsg");
 const timeLeftEl = document.getElementById("timeLeft");
 
-const OTP_EXPIRY = 120; // seconds
+const OTP_EXPIRY = 80; // seconds
 let timer;
 let timeLeft = OTP_EXPIRY;
 
@@ -67,7 +67,9 @@ async function resendOtp() {
     try {
         const res = await fetch("http://localhost:3000/user/resendOtp", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json" 
+            },
             body: JSON.stringify({ email })
         });
 
@@ -80,7 +82,8 @@ async function resendOtp() {
             showError(data.reason || "Unable to resend OTP");
         }
 
-    } catch {
+    } catch (Err){
+        console.log("Error while resending " , Err)
         showError("Server error while resending OTP.");
     }
 

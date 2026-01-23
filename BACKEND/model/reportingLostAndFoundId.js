@@ -30,7 +30,7 @@ async function reportLostId(sentInfo) {
         };
 
     } catch (err) {
-        console.error("Database error while reporting lost ID ".err.message);
+        console.log("Database error while reporting lost ID " , err.message);
 
         return {
             success: false,
@@ -73,7 +73,7 @@ async function reportFoundId(sentInfo) {
         };
 
     } catch (Err) {
-        console.error("Database error while reporting found ID ".err.message);
+        console.log("Database error while reporting found ID " , Err.message);
 
         return {
             success: false,

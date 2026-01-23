@@ -178,10 +178,10 @@ let resendOtp = async (req, res) => {
         console.log(result)
 
         if (result.success) {
-            res.status(200).send("Otp Verification successfully sent")
+            res.status(200).json({"message" : "Otp Verification successfully sent"})
         } else {
             // if any error
-            res.status(400).send(result.reason)
+            res.status(400).send({"message" : "Error happened"})
         }
 
     } catch (err) {

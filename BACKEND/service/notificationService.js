@@ -14,7 +14,7 @@ class NotificationService {
         try {
             // Connect to PostgreSQL for listening
             const client = await pool.connect();
-            
+
             // Listen for different notification channels
             await client.query('LISTEN lost_id_found');
             await client.query('LISTEN rejected_request');
@@ -28,9 +28,9 @@ class NotificationService {
 
             this.isListening = true;
             console.log('Notification service started listening to PostgreSQL events');
-            
+
         } catch (error) {
-            console.error('Error starting notification service:', error);
+            console.log('Error starting notification service:', error);
         }
     }
 
@@ -38,7 +38,7 @@ class NotificationService {
     async handleNotification(channel, payload) {
         try {
             const data = JSON.parse(payload);
-            
+
             switch (channel) {
                 case 'lost_id_found':
                     await this.handleLostIdFound(data);
@@ -56,7 +56,7 @@ class NotificationService {
                     console.log(`Unknown notification channel: ${channel}`);
             }
         } catch (error) {
-            console.error('Error handling notification:', error.message);
+            console.log('Error handling notification:', error.message);
         }
     }
 
@@ -103,7 +103,7 @@ class NotificationService {
                 console.log(`Lost ID found notification sent to ${student.email}`);
             }
         } catch (error) {
-            console.error('Error handling lost ID found notification:', error.message);
+            console.log('Error handling lost ID found notification:', error.message);
         }
     }
 
@@ -119,8 +119,26 @@ class NotificationService {
                 WHERE u.id = $1 AND rr.id = $2
             `, [data.requester_id, data.rejection_id]);
 
+
+
+
+
             if (result.rows.length > 0) {
                 const { email, name, reason, id_number } = result.rows[0];
+
+                // information abt who rejected u
+                let ress2 = await pool.query(
+                    `
+                    SELECT u.name AS staffName
+                    , u.role 
+                    FROM Users AS u 
+                    WHERE u.id = $1
+                    ` , [ data.rejector_id]
+
+                )
+
+                let { staffname ,  role } = ress2.rows[0];
+
 
                 const emailContent = {
                     to: email,
@@ -131,8 +149,9 @@ class NotificationService {
                         We regret to inform you that your request for a new ID (ID: ${id_number}) has been rejected.
                         
                         Reason for rejection: ${reason}
+                        by ${staffname} from ${role}.
                         
-                        If you believe this is an error or need clarification, please contact the administrative office.
+                        If you believe this is an error or need clarification, please contact the personnel and have them unreject you to continue the flow.
                         
                         Best regards,
                         Lost ID Automation System
@@ -143,7 +162,7 @@ class NotificationService {
                 console.log(`Request rejection notification sent to ${email}`);
             }
         } catch (error) {
-            console.error('Error handling request rejected notification:', error.message);
+            console.log('Error handling request rejected notification:', error.message);
         }
     }
 
@@ -182,7 +201,7 @@ class NotificationService {
                 console.log(`Request unrejection notification sent to ${email}`);
             }
         } catch (error) {
-            console.error('Error handling request unrejected notification:', error.message);
+            console.log('Error handling request unrejected notification:', error.message);
         }
     }
 
@@ -222,7 +241,7 @@ class NotificationService {
                 console.log(`Request approval notification sent to ${email}`);
             }
         } catch (error) {
-            console.error('Error handling request approved notification:', error.message);
+            console.log('Error handling request approved notification:', error.message);
         }
     }
 
@@ -235,7 +254,7 @@ class NotificationService {
             this.isListening = false;
             console.log('Notification service stopped');
         } catch (error) {
-            console.error('Error stopping notification service:', error.message);
+            console.log('Error stopping notification service:', error.message);
         }
     }
 }

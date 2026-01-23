@@ -124,7 +124,7 @@ app.use((req, res) => {
 
 // Global error handler
 // app.use((error, req, res, next) => {
-//     console.error('Global error handler:', error);
+//     console.log('Global error handler:', error);
 
 //     // Handle specific error types
 //     if (error.name === 'ValidationError') {
@@ -187,12 +187,12 @@ const gracefulShutdown = async (signal) => {
         
         // Force close after 30 seconds
         setTimeout(() => {
-            console.error('Could not close connections in time, forcefully shutting down');
+            console.log('Could not close connections in time, forcefully shutting down');
             process.exit(1);
         }, 30000);
         
     } catch (error) {
-        console.error('Error during shutdown:', error);
+        console.log('Error during shutdown:', error);
         process.exit(1);
     }
 };
@@ -203,13 +203,13 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
+    console.log('Uncaught Exception:', error);
     gracefulShutdown('uncaughtException');
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    console.log('Unhandled Rejection at:', promise, 'reason:', reason);
     gracefulShutdown('unhandledRejection');
 });
 
@@ -230,7 +230,7 @@ const server = app.listen(PORT, async () => {
         console.log(' Database connected successfully');
         
     } catch (error) {
-        console.error(' Failed to initialize services:', error);
+        console.log(' Failed to initialize services:', error);
         process.exit(1);
     }
 });

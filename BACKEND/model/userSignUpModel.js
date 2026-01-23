@@ -235,7 +235,7 @@ async function updateOTP(sentInfo) {
     try {
         // sentInfo = { email , OTP }
         let { email, OTP } = sentInfo;
-        let result = await pool.query('UPDATE pendingUsers SET otpHashed = $2 WHERE email = $1', [email, OTP]);
+        let result = await pool.query('UPDATE pendingUsers SET otp_hashed = $2 WHERE email = $1', [email, OTP]);
 
         if (result.rowCount === 0) {
             // then nothing got updated so return unsuccessful

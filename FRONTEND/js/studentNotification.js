@@ -1,3 +1,6 @@
+import  {requestAccess} from './requestingAccessFromRef.js';
+
+
 const token = localStorage.getItem('accessToken'); // JWT token
 
 const rejectionsList = document.getElementById('rejectionsList');
@@ -21,6 +24,10 @@ async function loadNotifications() {
             }
         });
 
+        if (response.status === 401) {
+            console.log("Access token expired")
+            await requestAccess();
+        }
         const data = await response.json();
 
         console.log("data from backend " , data)
@@ -32,7 +39,7 @@ async function loadNotifications() {
             statusMessage.textContent = `❌ ${data.message || 'Failed to load notifications'}`;
         }
     } catch (error) {
-        console.error('Error fetching notifications:', error);
+        console.log('Error fetching notifications:', error);
         statusMessage.textContent = '❌ Server error. Please try again later.';
     }
 }

@@ -27,7 +27,7 @@ async function banStudent(sentInfo) {
         };
 
     } catch (err) {
-        console.error("Database error while banning student" , err.message);
+        console.log("Database error while banning student" , err.message);
 
         return {
             success: false,

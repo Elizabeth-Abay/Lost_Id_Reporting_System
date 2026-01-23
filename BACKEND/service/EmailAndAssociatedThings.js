@@ -40,7 +40,7 @@ async function sendingOTPEmail(emailInfo) {
         let { email, OTP } = emailInfo;
 
         let emailSentOut = {
-            from: `LOST ID REPORT`,
+            from: `"Lost ID System" <noreply@lostid.system>`,
             to: email,
             subject: 'OTP verification',
             html: `<b>OTP IS ${OTP} </b>`
@@ -86,7 +86,7 @@ async function sendEmailNotification(emailContent) {
         };
         
     } catch (error) {
-        console.error('Error sending email:', error.message);
+        console.log('Error sending email:', error.message);
         return {
             success: false,
             error: error.message
