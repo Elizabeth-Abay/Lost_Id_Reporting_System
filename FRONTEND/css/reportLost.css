@@ -1,0 +1,125 @@
+:root {
+      --primary: #1e3a8a;
+      --secondary: #3b82f6;
+      --light: #f8fafc;
+      --dark: #0f172a;
+      --gray: #94a3b8;
+      --danger: #dc2626;
+      --white: #ffffff;
+  }
+
+  * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+  }
+
+  .card {
+      background: var(--white);
+      width: 100%;
+      max-width: 520px;
+      border-radius: 28px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+      padding: 32px;
+  }
+
+  .card h1 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 6px;
+  }
+
+  .card p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+  }
+
+  .form-group {
+      margin-bottom: 18px;
+  }
+
+  label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+  }
+
+  input,
+  textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(30, 58, 138, 0.2);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+  }
+
+  textarea {
+      resize: none;
+      min-height: 100px;
+  }
+
+  input:focus,
+  textarea:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .hint {
+      font-size: 0.75rem;
+      color: var(--gray);
+      margin-top: 4px;
+  }
+
+  .actions {
+      margin-top: 28px;
+  }
+
+  button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.25s ease;
+  }
+
+  button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.35);
+  }
+
+  .warning {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--danger);
+      text-align: center;
+  }
+
+  @media (max-width: 480px) {
+      .card {
+          padding: 24px;
+      }
+
+      .card h1 {
+          font-size: 1.6rem;
+      }
+  }
+

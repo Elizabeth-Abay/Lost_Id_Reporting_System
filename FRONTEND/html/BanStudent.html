@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ban Student</title>
+    <link rel="stylesheet" href="../css/banStudent.css">
+</head>
+
+<body>
+
+    <div class="form-card">
+        <h1 class="form-title">Ban Student</h1>
+        <p class="form-subtitle">Restrict a student's access to the system</p>
+
+        <div class="warning-box">
+            ⚠️ This action is serious. The student will be blocked from accessing services until the ban expires or is
+            lifted.
+        </div>
+
+        <form>
+            <div class="row">
+                <div>
+                    <label for="studentId">Student ID</label>
+                    <input type="text" id="studentId" placeholder="STU-20491" required />
+                </div>
+
+
+            </div>
+
+            <div>
+                <label for="reason">Reason for Ban</label>
+                <textarea id="reason" placeholder="Clearly explain the reason for banning this student..."
+                    required></textarea>
+            </div>
+
+
+
+            <div class="actions">
+                <button type="button" class="btn btn-cancel">Cancel</button>
+                <button type="submit" class="btn btn-ban">Confirm Ban</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>
